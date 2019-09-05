@@ -1,3 +1,5 @@
+#ifndef COLOR_HPP
+#define COLOR_HPP
 class Color
 {
     public:
@@ -14,3 +16,4 @@ class Color
         //method
         void setColor(unsigned char R, unsigned char G, unsigned char B);
 };
+#endif

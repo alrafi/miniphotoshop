@@ -1,3 +1,5 @@
+#ifndef IMAGE_HPP
+#define IMAGE_HPP
 #include "Color.hpp"
 class Image
 {
@@ -36,3 +38,4 @@ public:
     //method getGreyData
     unsigned char getGreyData(int x, int y);
 };
+#endif

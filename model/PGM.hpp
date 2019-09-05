@@ -1,3 +1,5 @@
+#ifndef PGM_HPP
+#define PGM_HPP
 #include "Image.hpp"
 #include <string>
 
@@ -12,3 +14,4 @@ public:
     Image readFile();
     void writeFile(Image image);
 };
+#endif
