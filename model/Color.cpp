@@ -2,7 +2,7 @@
 Color::Color(){
     R = 0;
     G = 0;
-    B = 0:
+    B = 0;
 }
 
 Color::Color(unsigned char R, unsigned char G, unsigned char B){

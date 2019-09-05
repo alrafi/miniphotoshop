@@ -13,6 +13,7 @@ public:
     bool isColor;
     
     //constructor
+    Image();
     Image(int width, int height, bool isColor);
     
     //destroyer
@@ -26,11 +27,31 @@ public:
     void deleteColorData();
     void deleteGreyData();
 
+    //setter attribute
+    void setWidth(int width);
+    void setHeight(int height);
+    void setColor(bool isColor);
+    
+    //call this method when you want to update size of image, this func will set the size with updated width and updated heigth
+    void updateSize();
+
     //method setColorData
     void setColorData(int x, int y, unsigned char R, unsigned char G, unsigned char B);
     
     //method setGreyData
     void setGreyData(int x, int y, unsigned char grey);
+
+    //method setColorData by Index
+    void setColorDataByIndex(int index, unsigned char R, unsigned char G, unsigned char B);
+    
+    //method setGreyData by Index
+    void setGreyDataByIndex(int index, unsigned char grey);
+
+    //method to getcolordata by index
+    Color getColorDataByIndex(int index);
+
+    //method to getgreydata by index
+    unsigned char getGreyDataByIndex(int index);
 
     //method getColorData
     Color getColorData(int x, int y);

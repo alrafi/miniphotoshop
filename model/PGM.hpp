@@ -11,7 +11,7 @@ public:
 
     PGM(string filename);
 
-    Image readFile();
-    void writeFile(Image image);
+    void readFile(Image& image);
+    void writeFile(Image image, string filename);
 };
 #endif
