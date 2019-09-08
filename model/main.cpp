@@ -1,18 +1,22 @@
-#include "PGM.hpp"
+#include "PBM.hpp"
 #include <iostream>
 
 using namespace std;
 
 int main(){
-    PGM pgm("baboon.ascii.pgm");
+    PBM pbm("circle.ascii.pbm");
     Image image;
-    pgm.readFile(image);
+    pbm.readFile(image);
 
     cout << image.width << endl;
     cout << image.height << endl;
     for(int i = 0; i<10; i++){
-        cout << (unsigned int) image.greyData[i] << endl;
+        if ((unsigned int) image.greyData[i] == 255){
+            cout << "0" << endl;
+        }else{
+            cout << "1" << endl;
+        }    
     }
-    pgm.writeFile(image, "anjay");
+    pbm.writeFile(image, "anjay2");
     return 0;
 }
