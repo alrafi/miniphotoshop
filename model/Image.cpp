@@ -94,3 +94,21 @@ Color Image :: getColorData(int x, int y){
 unsigned char Image :: getGreyData(int x, int y){
     return greyData[(y * width) + x];
 }
+
+void Image :: citraNegativeGrayscale(){
+    if (greyData != NULL){
+        for(int i =0; i<size; i++){
+            greyData[i] = 255 - greyData[i];
+        }
+    }
+}
+
+void Image :: citraNegativeColor(){
+    if (colorData != NULL){
+        for(int i = 0; i<size; i++){
+            colorData[i].R = 255 - colorData[i].R;
+            colorData[i].G = 255 - colorData[i].G;
+            colorData[i].B = 255 - colorData[i].B;
+        }
+    }
+}
