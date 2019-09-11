@@ -112,3 +112,47 @@ void Image :: citraNegativeColor(){
         }
     }
 }
+
+void Image :: brightnessGrayscale(int b){
+    if(greyData != NULL){
+        for(int i = 0; i<size; i++){
+            if(greyData[i]+b > 255){
+                greyData[i] = 255;
+            }else if (greyData[i]+b<0){
+                greyData[i] = 0;
+            }else{
+                greyData[i] = greyData[i] + b;
+            }
+        }
+    }
+}
+
+void Image :: brightnessColorscale(int b){
+    if(colorData != NULL){
+        for(int i = 0; i<size; i++){
+            if(colorData[i].R +b > 255){
+                colorData[i].R = 255;
+            }else if (colorData[i].R+b<0){
+                colorData[i].R = 0;
+            }else{
+                colorData[i].R = colorData[i].R + b;
+            }
+
+            if(colorData[i].G +b > 255){
+                colorData[i].G = 255;
+            }else if (colorData[i].G+b<0){
+                colorData[i].G = 0;
+            }else{
+                colorData[i].G = colorData[i].G + b;
+            }
+
+            if(colorData[i].B +b > 255){
+                colorData[i].B = 255;
+            }else if (colorData[i].B+b<0){
+                colorData[i].B = 0;
+            }else{
+                colorData[i].B = colorData[i].B + b;
+            }
+        }
+    }
+}

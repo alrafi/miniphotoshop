@@ -13,7 +13,7 @@ int main(){
     for(int i = 0; i<10; i++){
         cout << (unsigned int) image.colorData[i].R << "  " << (unsigned int) image.colorData[i].G << "  " << (unsigned int) image.colorData[i].B << endl;
     }
-    image.citraNegativeColor();
+    image.brightnessColorscale(-100);
     ppm.writeFile(image, "anjay1hhh");
     return 0;
 }

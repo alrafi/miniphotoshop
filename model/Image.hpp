@@ -64,6 +64,12 @@ public:
 
     //method color citra negative
     void citraNegativeColor();
-    
+
+    //method brightening grayscale
+    void brightnessGrayscale(int b);
+
+    //method brightening color
+    void brightnessColorscale(int b);
+
 };
 #endif
