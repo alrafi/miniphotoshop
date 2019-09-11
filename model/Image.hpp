@@ -58,5 +58,12 @@ public:
 
     //method getGreyData
     unsigned char getGreyData(int x, int y);
+
+    //menthod grayscale citra negative
+    void citraNegativeGrayscale();
+
+    //method color citra negative
+    void citraNegativeColor();
+    
 };
 #endif
