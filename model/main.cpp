@@ -1,10 +1,12 @@
 #include "PPM.hpp"
+#include "PGM.hpp"
 #include <iostream>
 
 using namespace std;
 
 int main(){
-    PPM ppm("blackbuck.ascii.ppm");
+    PPM ppm("pbmlib.ascii.ppm");
+    PGM pgm("hfjhfjh.pbm");
     Image image;
     ppm.readFile(image);
 
@@ -13,7 +15,7 @@ int main(){
     for(int i = 0; i<10; i++){
         cout << (unsigned int) image.colorData[i].R << "  " << (unsigned int) image.colorData[i].G << "  " << (unsigned int) image.colorData[i].B << endl;
     }
-    image.brightnessColorscale(-100);
-    ppm.writeFile(image, "anjay1hhh");
+    image.colorToGrayscale();
+    pgm.writeFile(image, "itemputih");
     return 0;
 }

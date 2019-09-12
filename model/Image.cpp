@@ -156,3 +156,13 @@ void Image :: brightnessColorscale(int b){
         }
     }
 }
+
+void Image :: colorToGrayscale(){
+    if(colorData != NULL){
+        createGreyData();
+        for(int i=0; i<size; i++){
+            int gray = (0.3* (int) colorData[i].R + 0.59 * (int)colorData[i].G + 0.11 * (int)colorData[i].B);
+            greyData[i] = gray;
+        }
+    }
+}

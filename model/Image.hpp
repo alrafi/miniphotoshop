@@ -71,5 +71,8 @@ public:
     //method brightening color
     void brightnessColorscale(int b);
 
-};
+    //method color to grayscale
+    void colorToGrayscale();
+    
+ };
 #endif
