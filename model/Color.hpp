@@ -15,5 +15,7 @@ class Color
 
         //method
         void setColor(unsigned char R, unsigned char G, unsigned char B);
+        bool operator==(Color& color);
+        bool operator<(const Color& color) const;
 };
 #endif
