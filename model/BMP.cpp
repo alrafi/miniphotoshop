@@ -1,9 +1,7 @@
 #include "BMP.hpp"
 #include <iostream>
-#include <vector>
 #include <fstream>
 #include <iterator>
-#include <map>
 
 using namespace std;
 BMP :: BMP(string filename){
@@ -75,21 +73,21 @@ void BMP :: readFile(Image& thisImage){
     
     // read image data
     imagefile.seekg(this->header.offset, imagefile.beg);
-    for (int i = 0; i < this->infoHeader.width; i++) {
-        for (int j = 0; j < this->infoHeader.height; j++) {
+    for (int i = 0; i < this->infoHeader.height; i++) {
+        for (int j = 0; j < this->infoHeader.width; j++) {
             if (this->infoHeader.nColours) {
                 imagefile.read((char *) &c, 1);
                 int index = c;
-                thisImage.setColorData(i,j,palette[index].R, palette[index].G, palette[index].B);
+                thisImage.setColorData(j,i,palette[index].R, palette[index].G, palette[index].B);
             } else if (this->infoHeader.bits == 24) {
                 unsigned char r,g,b;
                 imagefile.read((char *)&r, 1);
                 imagefile.read((char *)&g, 1);
                 imagefile.read((char *)&b, 1);
-                thisImage.setColorData(i,j,r,g,b);
+                thisImage.setColorData(j,i,r,g,b);
             } else {
                 imagefile.read ((char *) &c, 1);
-                thisImage.setGreyData(i,j,c);
+                thisImage.setGreyData(j,i,c);
             }
         }
     }
@@ -116,34 +114,13 @@ void BMP :: writeFile(Image thisImage, string filename){
     ofstream file;
     file.open(filename + ".bmp");
 
-    // create palette ,dictionary;
-    vector<Color> palette;
-    map<Color, unsigned char> dictionary;
-    if (thisImage.isColor) {
-        int currIdx = 0;
-        for (int i=0; i < thisImage.width; i++) {
-            for (int j=0; j< thisImage.height; i++) {
-                Color data = thisImage.getColorData(i,j);
-                if (!dictionary.count(data)) {
-                    dictionary[data] = currIdx;
-                    palette.push_back(data);
-                    currIdx++;
-                }
-            }
-        }
-    }
-    
     // create header
     Header header;
     header.type = 19778;
-    header.size = thisImage.isColor ?
-                    54 + palette.size()*4 + thisImage.size:
-                    54 + thisImage.size;
+    header.size = 54 + thisImage.size * (thisImage.isColor ? 3 : 1);
     header.reserved1 = 0;
     header.reserved2 = 0;
-    header.offset = thisImage.isColor ? // offset
-                    54 + palette.size()*4:
-                    54;
+    header.offset = 54; // offset
     //write header
     file.write((char *) &header.type, 2);
     file.write((char *) &header.size, 4);
@@ -157,29 +134,22 @@ void BMP :: writeFile(Image thisImage, string filename){
     infoHeader.width = thisImage.width;
     infoHeader.height = thisImage.height;
     infoHeader.planes = 1;
-    infoHeader.bits = 8;
+    infoHeader.bits = thisImage.isColor ? 24 : 8;
     infoHeader.compression = 0;
-    infoHeader.imageSize = thisImage.isColor ?
-                            palette.size()*4 + thisImage.size:
-                            thisImage.size;
+    infoHeader.imageSize = thisImage.size * (thisImage.isColor ? 3:1);
     infoHeader.xResolution = 2834;
     infoHeader.yResolution = 2834;
-    infoHeader.nColours = palette.size();
-    infoHeader.importantColours = palette.size();
+    infoHeader.nColours = 0;
+    infoHeader.importantColours = 0;
     // write info header
     file.write((char *) &infoHeader, 40);
-
-    // write palette
-    if (thisImage.isColor) {
-        for (int i=0; i<palette.size(); i++) {
-            file.write((char *) &palette[i], 3);
-        }
-    }
 
     // write imageData
     for (int i=0; i < thisImage.size;i++) {
         if (thisImage.isColor) {
-            file.write((char *) &dictionary[thisImage.colorData[i]], 1);
+            file.write((char *) &thisImage.colorData[i].R, 1);
+            file.write((char *) &thisImage.colorData[i].G, 1);
+            file.write((char *) &thisImage.colorData[i].B, 1);
         } else {
             file.write((char *) &thisImage.greyData[i], 1);
         }

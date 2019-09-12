@@ -1,4 +1,3 @@
-#include "PGM.hpp"
 #include "BMP.hpp"
 #include <iostream>
 #include <SDL.h>
@@ -34,7 +33,7 @@ void drawImage(Image& img) {
                         int g = img.getGreyData(i,j);
                         SDL_SetRenderDrawColor(renderer, g, g, g, 0);
                     }
-                    SDL_RenderDrawPoint(renderer,i,j);
+                    SDL_RenderDrawPoint(renderer,j,i);
                 }
             }
             SDL_RenderPresent(renderer);
@@ -67,12 +66,10 @@ int main(int argc, char** argv){
         BMP bmp(argv[1]);
         Image image;
         bmp.readFile(image);
+        cout << "drawing" << endl;
         drawImage(image);
+        bmp.writeFile(image, "tes");
     }
-    // cout << "write files" << endl;
-    // bmp.writeFile(image, "tes");
-    // BMP bmp2("tes.bmp");    
-    // bmp2.readFile(image);
 
     return 0;
 }
