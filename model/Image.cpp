@@ -227,4 +227,19 @@ Image Image :: operator|(Image image){
     return newImage;
 }
 
-
+Image& Image :: operator~(){
+    if (this->isColor == true){
+        for(int i = 0; i<this->size; i++){
+            unsigned char r = ~this->getColorDataByIndex(i).R; 
+            unsigned char g = ~this->getColorDataByIndex(i).G;
+            unsigned char b = ~this->getColorDataByIndex(i).B;
+            this->setColorDataByIndex(i,r,g,b);
+        }
+    }else{
+        for(int i = 0; i<this->size; i++){
+            unsigned char c = ~this->getGreyDataByIndex(i);
+            this->setGreyDataByIndex(i,c);
+        }
+    }
+    return *this;
+}
