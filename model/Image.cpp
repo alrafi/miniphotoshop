@@ -243,3 +243,174 @@ Image& Image :: operator~(){
     }
     return *this;
 }
+
+Image Image :: rotasi90CW(){
+    Image temp;
+    if(this->isColor == true){
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createColorData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=0; j<this->width; j++){
+                unsigned char r = this->getColorDataByIndex(index).R;
+                unsigned char g = this->getColorDataByIndex(index).G;
+                unsigned char b = this->getColorDataByIndex(index).B;
+                temp.setColorData(j,i,r,g,b);
+                index++;
+            }
+        }
+    }else{
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createGreyData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=0; j<this->width; j++){
+                unsigned char c = this->getGreyDataByIndex(index);
+                temp.setGreyData(j,i,c);
+                index++;
+            }
+        }
+    }
+    return temp;
+}
+
+Image Image :: rotasi90CCW(){
+    Image temp;
+    if(this->isColor == true){
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createColorData();
+        int index = 0;
+        for(int i=0; i<this->height; i++){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char r = this->getColorDataByIndex(index).R;
+                unsigned char g = this->getColorDataByIndex(index).G;
+                unsigned char b = this->getColorDataByIndex(index).B;
+                temp.setColorData(j,i,r,g,b);
+                index++;
+            }
+        }
+    }else{
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createGreyData();
+        int index = 0;
+        for(int i=0; i<this->height; i++){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char c = this->getGreyDataByIndex(index);
+                temp.setGreyData(j,i,c);
+                index++;
+            }
+        }
+    }
+    return temp;
+}
+
+Image Image :: rotasi180(){
+    Image temp;
+    if(this->isColor == true){
+        temp.setWidth(this->width);
+        temp.setHeight(this->height);
+        temp.updateSize();
+        temp.createColorData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char r = this->getColorDataByIndex(index).R;
+                unsigned char g = this->getColorDataByIndex(index).G;
+                unsigned char b = this->getColorDataByIndex(index).B;
+                temp.setColorData(j,i,r,g,b);
+                index++;
+            }
+        }
+    }else{
+        temp.setWidth(this->width);
+        temp.setHeight(this->height);
+        temp.updateSize();
+        temp.createGreyData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char c = this->getGreyDataByIndex(index);
+                temp.setGreyData(j,i,c);
+                index++;
+            }
+        }
+    }
+    return temp;
+}
+
+Image Image :: flipping(int type){
+    Image temp;
+    //horizontal
+    if (type == 1){
+        if(this->isColor == true){
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createColorData();
+            int index = 0;
+            for(int i = this->height-1; i>=0;i--){
+                for(int j = 0; j<this->width; j++){
+                    unsigned char r = this->getColorDataByIndex(index).R;
+                    unsigned char g = this->getColorDataByIndex(index).G;
+                    unsigned char b = this->getColorDataByIndex(index).B;
+                    temp.setColorData(i,j,r,g,b);
+                    index++;
+                }
+            }
+        } else {
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createGreyData();
+            int index = 0;
+            for(int i = this->height-1; i>=0;i--){
+                for(int j = 0; j<this->width; j++){
+                    unsigned char c = this->getGreyDataByIndex(index);
+                    temp.setGreyData(i,j,c);
+                    index++;
+                }
+            }
+        }
+    }
+    //vertical
+    else if (type == 0){
+        if(this->isColor == true){
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createColorData();
+            int index = 0;
+            for(int i = 0; i<this->height;i++){
+                for(int j = this->width-1; j>=0; j--){
+                    unsigned char r = this->getColorDataByIndex(index).R;
+                    unsigned char g = this->getColorDataByIndex(index).G;
+                    unsigned char b = this->getColorDataByIndex(index).B;
+                    temp.setColorData(i,j,r,g,b);
+                    index++;
+                }
+            }
+        } else {
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createGreyData();
+            int index = 0;
+            for(int i = 0; i<this->height;i++){
+                for(int j = this->width-1; j>=0; j--){
+                    unsigned char c = this->getGreyDataByIndex(index);
+                    temp.setGreyData(i,j,c);
+                    index++;
+                }
+            }
+        }
+    }
+    return temp;
+}

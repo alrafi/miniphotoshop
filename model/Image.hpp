@@ -83,10 +83,11 @@ public:
     Image& operator~();
 
     //operasi geometri
-    //rotasi
-    Image& rotasi(int rad);
-
+    //rotasi 
+    Image rotasi90CW();
+    Image rotasi90CCW();
+    Image rotasi180();
     //flipping
-    Image& flipping(int type);
+    Image flipping(int type);
  };
 #endif
