@@ -82,6 +82,11 @@ public:
     //operasi not
     Image& operator~();
 
-    
+    //operasi geometri
+    //rotasi
+    Image& rotasi(int rad);
+
+    //flipping
+    Image& flipping(int type);
  };
 #endif
