@@ -197,6 +197,34 @@ Image Image :: operator&(Image image){
     return newImage;
 }
 
-
+Image Image :: operator|(Image image){
+    Image newImage;
+    if ((this->isColor == true) && (image.isColor == true)){
+        if(this->width == image.width && this->height == image.height){
+            newImage.setWidth(this->width);
+            newImage.setHeight(this->height);
+            newImage.updateSize();
+            newImage.createColorData();
+            for(int i=0; i < this->size; i++){
+                unsigned char r = this->getColorDataByIndex(i).R | image.getColorDataByIndex(i).R;
+                unsigned char g = this->getColorDataByIndex(i).G | image.getColorDataByIndex(i).G;
+                unsigned char b = this->getColorDataByIndex(i).B | image.getColorDataByIndex(i).B;
+                newImage.setColorDataByIndex(i, r, g, b);
+            }
+        }
+    }else if((this->isColor == false) && (image.isColor == false)){
+        if(this->width == image.width && this->height == image.height){
+            newImage.setWidth(this->width);
+            newImage.setHeight(this->height);
+            newImage.updateSize();
+            newImage.createGreyData();
+            for(int i=0; i < this->size; i++){
+                unsigned char c = this->getGreyDataByIndex(i) | image.getGreyDataByIndex(i);
+                newImage.setGreyDataByIndex(i, c);
+            }
+        }
+    }
+    return newImage;
+}
 
 
