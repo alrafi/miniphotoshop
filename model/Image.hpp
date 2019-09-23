@@ -74,5 +74,14 @@ public:
     //method color to grayscale
     void colorToGrayscale();
     
+    //operasi boolean
+    //operasi and
+    Image operator&(Image image);
+    //operasi or
+    Image operator|(Image image);
+    //operasi not
+    Image& operator~();
+
+    
  };
 #endif
