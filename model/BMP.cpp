@@ -147,9 +147,9 @@ void BMP :: writeFile(Image thisImage, string filename){
     // write imageData
     for (int i=0; i < thisImage.size;i++) {
         if (thisImage.isColor) {
-            file.write((char *) &thisImage.colorData[i].R, 1);
-            file.write((char *) &thisImage.colorData[i].G, 1);
             file.write((char *) &thisImage.colorData[i].B, 1);
+            file.write((char *) &thisImage.colorData[i].G, 1);
+            file.write((char *) &thisImage.colorData[i].R, 1);
         } else {
             file.write((char *) &thisImage.greyData[i], 1);
         }
