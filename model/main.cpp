@@ -1,5 +1,8 @@
 #include "BMP.hpp"
 #include <iostream>
+#include "Histogram.hpp"
+#include "HistogramColor.hpp"
+#include "Image.hpp"
 #include <SDL.h>
 
 using namespace std;
@@ -64,8 +67,17 @@ int main(int argc, char** argv){
         cout << "error" << endl;
     } else {
         BMP bmp(argv[1]);
+        BMP bmp2(argv[1]);
         Image image;
         bmp.readFile(image);
+        if (!image.isColor) {
+            Histogram histogram(image);
+            cout << histogram.hist[50] << endl;
+        } else {
+            HistogramColor histogram(image);
+            cout << histogram.r->hist[218] << endl;
+        }
+        image.contrastStretching(50,200,0.2,2,0.2,25,250);
         cout << "drawing" << endl;
         drawImage(image);
         bmp.writeFile(image, "tes");

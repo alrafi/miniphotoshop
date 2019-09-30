@@ -58,5 +58,29 @@ public:
 
     //method getGreyData
     unsigned char getGreyData(int x, int y);
+
+    unsigned char* getRedData();
+    unsigned char* getGreenData();
+    unsigned char* getBlueData();
+
+    //method operator image
+    Image operator+(Image const &img);
+    Image operator+(int scalar);
+    Image operator-(Image const &img);
+    Image operator-(int scalar);
+    Image& operator=(const Image &img);
+    Image operator*(const Image &img);
+    Image operator*(int scalar);
+    Image operator*(float scalar);
+    Image operator/(int scalar);
+    Image operator/(float scalar);
+
+    // transformasi log
+    void transformasiLog(float scalar);
+    void transformasiLogInv(float scalar);
+    void transformasiPangkat(float scalar, float gamma);
+
+    // contrast stretching
+    void contrastStretching(int a, int b,float alpha, float beta, float gamma, int ya, int yb);
 };
 #endif

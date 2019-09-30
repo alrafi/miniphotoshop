@@ -81,9 +81,9 @@ void BMP :: readFile(Image& thisImage){
                 thisImage.setColorData(j,i,palette[index].R, palette[index].G, palette[index].B);
             } else if (this->infoHeader.bits == 24) {
                 unsigned char r,g,b;
-                imagefile.read((char *)&r, 1);
-                imagefile.read((char *)&g, 1);
                 imagefile.read((char *)&b, 1);
+                imagefile.read((char *)&g, 1);
+                imagefile.read((char *)&r, 1);
                 thisImage.setColorData(j,i,r,g,b);
             } else {
                 imagefile.read ((char *) &c, 1);
@@ -91,7 +91,7 @@ void BMP :: readFile(Image& thisImage){
             }
         }
     }
-
+    cout << "data" << endl;
     if (thisImage.isColor) {
         for (int i=0; i < 20; i++) {
             cout << (int) thisImage.colorData[i].R << ","
