@@ -1,0 +1,1 @@
+g++ main.cpp Color.cpp Image.cpp PGM.cpp BMP.cpp Histogram.cpp HistogramColor.cpp -IC:\mingw_dev_lib\i686-w64-mingw32\include\SDL2 -LC:\mingw_dev_lib\i686-w64-mingw32\lib -lmingw32 -lSDL2main -lSDL2 -o main

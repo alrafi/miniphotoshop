@@ -1,5 +1,7 @@
 #include "Image.hpp"
 #include <iostream>
+#include <math.h>
+#include "Histogram.hpp"
 
 using namespace std;
 Image :: Image(){
@@ -93,4 +95,629 @@ Color Image :: getColorData(int x, int y){
 
 unsigned char Image :: getGreyData(int x, int y){
     return greyData[(y * width) + x];
+}
+
+Image Image :: operator+(Image const &img) {
+    Image image;
+    if ((this->size == img.size) && (this->isColor == img.isColor)) {
+        image.setWidth(this->width);
+        image.setHeight(this->height);
+        image.updateSize();
+        image.setColor(this->isColor);
+        if (this->isColor) image.createColorData();
+        else image.createGreyData();
+        for (int i=0; i < this->size; i++) {
+            if (this->isColor) {
+                image.colorData[i] = this->colorData[i] + img.colorData[i];
+            } else {
+                int hasil = this->greyData[i] + img.greyData[i];
+                image.greyData[i] = hasil > 255 ? 255 : hasil;
+            }
+        }
+    }
+    return image;
+}
+
+Image Image :: operator+(int scalar) {
+    Image image;
+    image.setWidth(this->width);
+    image.setHeight(this->height);
+    image.updateSize();
+    image.setColor(this->isColor);
+    if (this->isColor) image.createColorData();
+    else image.createGreyData();
+    for (int i=0; i < this->size; i++) {
+        if (this->isColor) {
+            image.colorData[i] = this->colorData[i] + scalar;
+        } else {
+            int hasil = this->greyData[i] + scalar;
+            image.greyData[i] = hasil > 255 ? 255 : hasil;
+        }
+    }
+    return image;
+}
+
+Image Image :: operator-(Image const &img) {
+    Image image;
+    if ((this->size == img.size) && (this->isColor == img.isColor)) {
+        image.setWidth(this->width);
+        image.setHeight(this->height);
+        image.updateSize();
+        image.setColor(this->isColor);
+        if (this->isColor) image.createColorData();
+        else image.createGreyData();
+        for (int i=0; i < this->size; i++) {
+            if (this->isColor) {
+                image.colorData[i] = this->colorData[i] - img.colorData[i];
+            } else {
+                int hasil = this->greyData[i] - img.greyData[i];
+                image.greyData[i] = hasil < 0 ? 0 : hasil;
+            }
+        }
+    }
+    return image;
+}
+
+Image Image :: operator-(int scalar){
+    Image image;
+    image.setWidth(this->width);
+    image.setHeight(this->height);
+    image.updateSize();
+    image.setColor(this->isColor);
+    if (this->isColor) image.createColorData();
+    else image.createGreyData();
+    for (int i=0; i < this->size; i++) {
+        if (this->isColor) {
+            image.colorData[i] = this->colorData[i] - scalar;
+        } else {
+            int hasil = this->greyData[i] - scalar;
+            image.greyData[i] = hasil < 0 ? 0 : hasil;
+        }
+    }
+    return image;
+}
+
+Image& Image::operator=(const Image &img) {
+    if (this->isColor && this->colorData!=NULL) this->deleteColorData();
+    else if (this->greyData!=NULL) this->deleteGreyData();
+    this->width = img.width;
+    this->height = img.height;
+    this->isColor = img.isColor;
+    this->size = img.size;
+    if (this->isColor) this->createColorData();
+    else this->createGreyData();
+    for (int i = 0; i<this->size ;i++) {
+        if (this->isColor) this->colorData[i] = img.colorData[i];
+        else this->greyData[i] = img.greyData[i]; 
+    }
+    return *this;
+}
+
+
+Image Image::operator*(const Image &img){
+    Image image;
+    if ((this->isColor == img.isColor) && (this->width == img.height)) {
+        image.width = img.width;
+        image.height = this->height;
+        image.updateSize();
+        if (this->isColor) image.createColorData();
+        else  image.createGreyData();
+        for (int i=0; i<this->height; i++){
+            for (int j=0; j<img.width; j++){
+                int temp = 0;
+                Color c;
+                for (int k=0; k<this->width; k++) {
+                    if (image.isColor) {
+                        c = c + (this->colorData[(i * this->width) + k] * img.colorData[(k * img.width) + j]);
+                    } else {
+                        temp += (this->greyData[(i * this->width) + k] * img.greyData[(k * img.width) + j]);
+                    }
+                }
+                if (image.isColor) {
+                    image.colorData[(i * image.width) + j] = c;
+                } else {
+                    temp = temp<0 ? 0 : temp;
+                    temp = temp>255 ? 255 : temp;
+                    image.greyData[(i * image.width) + j] = temp;
+                }
+            }
+        }
+    }
+    return image;
+}
+Image Image::operator*(int scalar){
+    Image image;
+    image.width = this->width;
+    image.height = this->height;
+    image.updateSize();
+    image.isColor = this->isColor;
+    if (this->isColor) image.createColorData();
+    else  image.createGreyData();
+    for (int i=0; i < image.size; i++) {
+        if (image.isColor){
+            image.colorData[i] = this->colorData[i] * scalar;
+        } else {
+            int temp = this->greyData[i] * scalar;
+            temp = temp<0 ? 0 : temp;
+            temp = temp>255 ? 255 : temp;
+            image.greyData[i] = temp;
+        }
+    }
+    return image;
+}
+Image Image::operator*(float scalar){
+    Image image;
+    image.width = this->width;
+    image.height = this->height;
+    image.updateSize();
+    image.isColor = this->isColor;
+    if (this->isColor) image.createColorData();
+    else  image.createGreyData();
+    for (int i=0; i < image.size; i++) {
+        if (image.isColor){
+            image.colorData[i] = this->colorData[i] * scalar;
+        } else {
+            int temp = round(this->greyData[i] * scalar);
+            temp = temp<0 ? 0 : temp;
+            temp = temp>255 ? 255 : temp;
+            image.greyData[i] = temp;
+        }
+    }
+    return image;
+}
+Image Image::operator/(int scalar){
+    Image image;
+    image.width = this->width;
+    image.height = this->height;
+    image.updateSize();
+    image.isColor = this->isColor;
+    if (this->isColor) image.createColorData();
+    else  image.createGreyData();
+    for (int i=0; i < image.size; i++) {
+        if (image.isColor){
+            image.colorData[i] = this->colorData[i] / scalar;
+        } else {
+            int temp = round(this->greyData[i] / scalar);
+            temp = temp<0 ? 0 : temp;
+            temp = temp>255 ? 255 : temp;
+            image.greyData[i] = temp;
+        }
+    }
+    return image;
+}
+Image Image::operator/(float scalar){
+    Image image;
+    image.width = this->width;
+    image.height = this->height;
+    image.updateSize();
+    image.isColor = this->isColor;
+    if (this->isColor) image.createColorData();
+    else  image.createGreyData();
+    for (int i=0; i < image.size; i++) {
+        if (image.isColor){
+            image.colorData[i] = this->colorData[i] / scalar;
+        } else {
+            int temp = round(this->greyData[i] / scalar);
+            temp = temp<0 ? 0 : temp;
+            temp = temp>255 ? 255 : temp;
+            image.greyData[i] = temp;
+        }
+    }
+    return image;
+}
+
+unsigned char* Image::getRedData(){
+    unsigned char* data = new unsigned char[this->size];
+    for (int i=0;i<this->size;i++) {
+        data[i] = this->colorData[i].R;
+    }
+    return data;
+}
+unsigned char* Image::getGreenData(){
+    unsigned char* data = new unsigned char[this->size];
+    for (int i=0;i<this->size;i++) {
+        data[i] = this->colorData[i].G;
+    }
+    return data;
+}
+unsigned char* Image::getBlueData(){
+    unsigned char* data = new unsigned char[this->size];
+    for (int i=0;i<this->size;i++) {
+        data[i] = this->colorData[i].B;
+    }
+    return data;
+}
+void Image::transformasiLog(float scalar){
+    for (int i=0;i<this->size;i++) {
+        if (this->isColor) {
+            int r = scalar * log (1 + this->colorData[i].R);
+            int g = scalar * log (1 + this->colorData[i].G);
+            int b = scalar * log (1 + this->colorData[i].B);
+            this->colorData[i].R = r > 255 ? 255 : r;
+            this->colorData[i].G = g > 255 ? 255 : g;
+            this->colorData[i].B = b > 255 ? 255 : b;
+        } else {
+            int g = scalar * log(1 + this->greyData[i]);
+            this->greyData[i] = g > 255 ? 255 : g;
+        }
+    }
+}
+void Image::transformasiLogInv(float scalar){
+    for (int i=0;i<this->size;i++) {
+        if (this->isColor) {
+            int r = exp (1 + this->colorData[i].R) / scalar;
+            int g = exp (1 + this->colorData[i].G) / scalar;
+            int b = exp (1 + this->colorData[i].B) / scalar;
+            this->colorData[i].R = r > 255 ? 255 : r;
+            this->colorData[i].G = g > 255 ? 255 : g;
+            this->colorData[i].B = b > 255 ? 255 : b;
+        } else {
+            int g = exp(1 + this->greyData[i]) / scalar;
+            this->greyData[i] = g > 255 ? 255 : g;
+        }
+    }
+}
+
+void Image::transformasiPangkat(float scalar, float gamma){
+    for (int i=0;i<this->size;i++) {
+        if (this->isColor) {
+            int r = scalar * pow (this->colorData[i].R, 1/gamma);
+            int g = scalar * pow (this->colorData[i].G, 1/gamma);
+            int b = scalar * pow (this->colorData[i].B, 1/gamma);
+            this->colorData[i].R = r > 255 ? 255 : r;
+            this->colorData[i].G = g > 255 ? 255 : g;
+            this->colorData[i].B = b > 255 ? 255 : b;
+        } else {
+            int g = scalar * pow (this->greyData[i], 1/gamma);
+            this->greyData[i] = g > 255 ? 255 : g;
+        }
+    }
+}
+
+void Image::contrastStretching(int a, int b,float alpha, float beta, float gamma, int ya, int yb){
+    if (this->isColor) {
+        for (int i=0; i<this->size; i++) {
+            int R = this->colorData[i].R; 
+            int G = this->colorData[i].G;
+            int B = this->colorData[i].B;
+            // red
+            if (R < a) this->colorData[i].R = (alpha * R) > 255 ? 255:alpha*R;
+            else if (R >=b) this->colorData[i].R = (gamma * (R - b) + yb) > 255 ? 255:(gamma * (R - b) + yb);
+            else this->colorData[i].R = (beta * (R - a) + ya) > 255 ? 255:(beta * (R - a) + ya);
+            // green
+            if (G < a) this->colorData[i].G = (alpha * G) > 255 ? 255:(alpha * G);
+            else if (G >=b) this->colorData[i].G = (gamma * (G - b) + yb) > 255 ? 255:(gamma * (G - b) + yb);
+            else this->colorData[i].G = (beta * (G - a) + ya) > 255 ? 255:(beta * (G - a) + ya);
+            // blue
+            if (B < a) this->colorData[i].B = (alpha * B) > 255 ? 255:(alpha * B);
+            else if (B >=b) this->colorData[i].B = (gamma * (B - b) + yb) > 255 ? 255:(gamma * (B - b) + yb);
+            else this->colorData[i].B = (beta * (B - a) + ya) > 255 ? 255:(beta * (B - a) + ya);
+        }
+    } else {
+        for (int i=0; i<this->size; i++) {
+            int val = this->greyData[i];
+            if (val < a) this->greyData[i] = (alpha * val) > 255 ? 255:(alpha * val);
+            else if (val >=b) this->greyData[i] = (gamma * (val - b) + yb) > 255 ? 255:(gamma * (val - b) + yb);
+            else this->greyData[i] = (beta * (val - a) + ya) > 255 ? 255:(beta * (val - a) + ya);
+        }
+    }
+}
+void Image :: citraNegativeGrayscale(){
+    if (greyData != NULL){
+        for(int i =0; i<size; i++){
+            greyData[i] = 255 - greyData[i];
+        }
+    }
+}
+
+void Image :: citraNegativeColor(){
+    if (colorData != NULL){
+        for(int i = 0; i<size; i++){
+            colorData[i].R = 255 - colorData[i].R;
+            colorData[i].G = 255 - colorData[i].G;
+            colorData[i].B = 255 - colorData[i].B;
+        }
+    }
+}
+
+void Image :: brightnessGrayscale(int b){
+    if(greyData != NULL){
+        for(int i = 0; i<size; i++){
+            if(greyData[i]+b > 255){
+                greyData[i] = 255;
+            }else if (greyData[i]+b<0){
+                greyData[i] = 0;
+            }else{
+                greyData[i] = greyData[i] + b;
+            }
+        }
+    }
+}
+
+void Image :: brightnessColorscale(int b){
+    if(colorData != NULL){
+        for(int i = 0; i<size; i++){
+            if(colorData[i].R +b > 255){
+                colorData[i].R = 255;
+            }else if (colorData[i].R+b<0){
+                colorData[i].R = 0;
+            }else{
+                colorData[i].R = colorData[i].R + b;
+            }
+
+            if(colorData[i].G +b > 255){
+                colorData[i].G = 255;
+            }else if (colorData[i].G+b<0){
+                colorData[i].G = 0;
+            }else{
+                colorData[i].G = colorData[i].G + b;
+            }
+
+            if(colorData[i].B +b > 255){
+                colorData[i].B = 255;
+            }else if (colorData[i].B+b<0){
+                colorData[i].B = 0;
+            }else{
+                colorData[i].B = colorData[i].B + b;
+            }
+        }
+    }
+}
+
+void Image :: colorToGrayscale(){
+    if(colorData != NULL){
+        createGreyData();
+        for(int i=0; i<size; i++){
+            int gray = (0.3* (int) colorData[i].R + 0.59 * (int)colorData[i].G + 0.11 * (int)colorData[i].B);
+            greyData[i] = gray;
+        }
+    }
+}
+
+Image Image :: operator&(Image image){
+    Image newImage;
+    if ((this->isColor == true) && (image.isColor == true)){
+        if(this->width == image.width && this->height == image.height){
+            newImage.setWidth(this->width);
+            newImage.setHeight(this->height);
+            newImage.updateSize();
+            newImage.createColorData();
+            for(int i=0; i < this->size; i++){
+                unsigned char r = this->getColorDataByIndex(i).R & image.getColorDataByIndex(i).R;
+                unsigned char g = this->getColorDataByIndex(i).G & image.getColorDataByIndex(i).G;
+                unsigned char b = this->getColorDataByIndex(i).B & image.getColorDataByIndex(i).B;
+                newImage.setColorDataByIndex(i, r, g, b);
+            }
+        }
+    }else if((this->isColor == false) && (image.isColor == false)){
+        if(this->width == image.width && this->height == image.height){
+            newImage.setWidth(this->width);
+            newImage.setHeight(this->height);
+            newImage.updateSize();
+            newImage.createGreyData();
+            for(int i=0; i < this->size; i++){
+                unsigned char c = this->getGreyDataByIndex(i) & image.getGreyDataByIndex(i);
+                newImage.setGreyDataByIndex(i, c);
+            }
+        }
+    }
+    return newImage;
+}
+
+Image Image :: operator|(Image image){
+    Image newImage;
+    if ((this->isColor == true) && (image.isColor == true)){
+        if(this->width == image.width && this->height == image.height){
+            newImage.setWidth(this->width);
+            newImage.setHeight(this->height);
+            newImage.updateSize();
+            newImage.createColorData();
+            for(int i=0; i < this->size; i++){
+                unsigned char r = this->getColorDataByIndex(i).R | image.getColorDataByIndex(i).R;
+                unsigned char g = this->getColorDataByIndex(i).G | image.getColorDataByIndex(i).G;
+                unsigned char b = this->getColorDataByIndex(i).B | image.getColorDataByIndex(i).B;
+                newImage.setColorDataByIndex(i, r, g, b);
+            }
+        }
+    }else if((this->isColor == false) && (image.isColor == false)){
+        if(this->width == image.width && this->height == image.height){
+            newImage.setWidth(this->width);
+            newImage.setHeight(this->height);
+            newImage.updateSize();
+            newImage.createGreyData();
+            for(int i=0; i < this->size; i++){
+                unsigned char c = this->getGreyDataByIndex(i) | image.getGreyDataByIndex(i);
+                newImage.setGreyDataByIndex(i, c);
+            }
+        }
+    }
+    return newImage;
+}
+
+Image& Image :: operator~(){
+    if (this->isColor == true){
+        for(int i = 0; i<this->size; i++){
+            unsigned char r = ~this->getColorDataByIndex(i).R; 
+            unsigned char g = ~this->getColorDataByIndex(i).G;
+            unsigned char b = ~this->getColorDataByIndex(i).B;
+            this->setColorDataByIndex(i,r,g,b);
+        }
+    }else{
+        for(int i = 0; i<this->size; i++){
+            unsigned char c = ~this->getGreyDataByIndex(i);
+            this->setGreyDataByIndex(i,c);
+        }
+    }
+    return *this;
+}
+
+Image Image :: rotasi90CW(){
+    Image temp;
+    if(this->isColor == true){
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createColorData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=0; j<this->width; j++){
+                unsigned char r = this->getColorDataByIndex(index).R;
+                unsigned char g = this->getColorDataByIndex(index).G;
+                unsigned char b = this->getColorDataByIndex(index).B;
+                temp.setColorData(j,i,r,g,b);
+                index++;
+            }
+        }
+    }else{
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createGreyData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=0; j<this->width; j++){
+                unsigned char c = this->getGreyDataByIndex(index);
+                temp.setGreyData(j,i,c);
+                index++;
+            }
+        }
+    }
+    return temp;
+}
+
+Image Image :: rotasi90CCW(){
+    Image temp;
+    if(this->isColor == true){
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createColorData();
+        int index = 0;
+        for(int i=0; i<this->height; i++){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char r = this->getColorDataByIndex(index).R;
+                unsigned char g = this->getColorDataByIndex(index).G;
+                unsigned char b = this->getColorDataByIndex(index).B;
+                temp.setColorData(j,i,r,g,b);
+                index++;
+            }
+        }
+    }else{
+        temp.setWidth(this->height);
+        temp.setHeight(this->width);
+        temp.updateSize();
+        temp.createGreyData();
+        int index = 0;
+        for(int i=0; i<this->height; i++){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char c = this->getGreyDataByIndex(index);
+                temp.setGreyData(j,i,c);
+                index++;
+            }
+        }
+    }
+    return temp;
+}
+
+Image Image :: rotasi180(){
+    Image temp;
+    if(this->isColor == true){
+        temp.setWidth(this->width);
+        temp.setHeight(this->height);
+        temp.updateSize();
+        temp.createColorData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char r = this->getColorDataByIndex(index).R;
+                unsigned char g = this->getColorDataByIndex(index).G;
+                unsigned char b = this->getColorDataByIndex(index).B;
+                temp.setColorData(j,i,r,g,b);
+                index++;
+            }
+        }
+    }else{
+        temp.setWidth(this->width);
+        temp.setHeight(this->height);
+        temp.updateSize();
+        temp.createGreyData();
+        int index = 0;
+        for(int i=this->height-1; i>=0; i--){
+            for(int j=this->width-1; j>=0; j--){
+                unsigned char c = this->getGreyDataByIndex(index);
+                temp.setGreyData(j,i,c);
+                index++;
+            }
+        }
+    }
+    return temp;
+}
+
+Image Image :: flipping(int type){
+    Image temp;
+    //horizontal
+    if (type == 1){
+        if(this->isColor == true){
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createColorData();
+            int index = 0;
+            for(int i = this->height-1; i>=0;i--){
+                for(int j = 0; j<this->width; j++){
+                    unsigned char r = this->getColorDataByIndex(index).R;
+                    unsigned char g = this->getColorDataByIndex(index).G;
+                    unsigned char b = this->getColorDataByIndex(index).B;
+                    temp.setColorData(i,j,r,g,b);
+                    index++;
+                }
+            }
+        } else {
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createGreyData();
+            int index = 0;
+            for(int i = this->height-1; i>=0;i--){
+                for(int j = 0; j<this->width; j++){
+                    unsigned char c = this->getGreyDataByIndex(index);
+                    temp.setGreyData(i,j,c);
+                    index++;
+                }
+            }
+        }
+    }
+    //vertical
+    else if (type == 0){
+        if(this->isColor == true){
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createColorData();
+            int index = 0;
+            for(int i = 0; i<this->height;i++){
+                for(int j = this->width-1; j>=0; j--){
+                    unsigned char r = this->getColorDataByIndex(index).R;
+                    unsigned char g = this->getColorDataByIndex(index).G;
+                    unsigned char b = this->getColorDataByIndex(index).B;
+                    temp.setColorData(i,j,r,g,b);
+                    index++;
+                }
+            }
+        } else {
+            temp.setWidth(this->width);
+            temp.setHeight(this->height);
+            temp.updateSize();
+            temp.createGreyData();
+            int index = 0;
+            for(int i = 0; i<this->height;i++){
+                for(int j = this->width-1; j>=0; j--){
+                    unsigned char c = this->getGreyDataByIndex(index);
+                    temp.setGreyData(i,j,c);
+                    index++;
+                }
+            }
+        }
+    }
+    return temp;
 }
