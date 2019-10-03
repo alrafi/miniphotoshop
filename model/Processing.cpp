@@ -10,7 +10,7 @@ void Processing::perataanHistogram(Image &image)
 {
     float sum;
     int HistEq[256];
-    Histogram newHist(image);
+    Histogram newHist(image, true);
     for (int i = 0; i < 256; i++)
     {
         sum = 0.0;
