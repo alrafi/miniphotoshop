@@ -5,4 +5,5 @@ class Processing
 {
 public:
   static void perataanHistogram(Image &image);
+  static void spesifikasiHistogram(Image &image, Histogram &spec);
 };
