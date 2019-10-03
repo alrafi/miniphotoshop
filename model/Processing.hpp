@@ -1,7 +1,8 @@
 #include "Image.hpp"
+#include "Histogram.hpp"
 
 class Processing
 {
 public:
-  static void grayLevelSlicing(Image &image);
+  static void perataanHistogram(Image &image);
 };

@@ -1,22 +1,31 @@
-include "Processing.hpp"
+#include "Processing.hpp"
+#include "Histogram.hpp"
 #include <iostream>
+#include <cmath>
 
-    using namespace std;
+using namespace std;
 
-static void Processing ::Processing(Image &image)
+// Perataan Histogram
+void Processing::perataanHistogram(Image &image)
 {
-  int row = col = image.length for (int i = 0; i < row; i++)
-  {
-    for (int j = 0; j < col; j++)
+    float sum;
+    int HistEq[256];
+    Histogram newHist(image);
+    for (int i = 0; i < 256; i++)
     {
-      if ((image[i][j] > 142) && (image[i][j] < 250))
-      {
-        image[i][j] = 255;
-      }
-      else
-      {
-        image[i][j] = 0;
-      }
+        sum = 0.0;
+        for (int j = 0; j <= i; j++)
+        {
+            sum += newHist.hist[j];
+        }
+        HistEq[i] = floor(255 * sum);
     }
-  }
+    cout << "oke" << endl;
+    for (int i = 0; i < image.size; i++)
+    {
+        image.setGreyDataByIndex(i, HistEq[image.greyData[i]]);
+        // cout << "size-" << i << endl;
+    }
+    cout << "siap" << endl;
 };
+// end of Perataan Histogram
