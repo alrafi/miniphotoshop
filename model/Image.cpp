@@ -722,6 +722,31 @@ Image Image :: flipping(int type){
     return temp;
 }
 
+void Image::konvolusi(int* filter){
+    int tempHeight = this->height-2; 
+    int tempWidth = this->width-2;
+    unsigned int* temp = new unsigned int[tempHeight * tempWidth];
+    for (int i=0; i<tempHeight; i++){
+        for (int j=0; j<tempWidth; j++){
+            // operasi dot
+            int sum=0;
+            for (int k=0;k<3;k++){
+                for (int l=0;l<3;l++){
+                    sum += filter[k*3 + l] * this->getGreyData(j+l,i+k);
+                }
+            }
+            // clipping
+            sum = sum < 0 ? 0 : sum;
+            temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+        }
+    }
+    for (int i=0; i<tempHeight; i++) {
+        for (int j=0; j <tempWidth; j++){
+            this->setGreyData(j+1,i+1,temp[i*tempHeight + j]);
+        }
+    }
+}
+
 void Image::show() {
     cout << "height: " << this->height << endl;
     cout << "width: " << this->width << endl;

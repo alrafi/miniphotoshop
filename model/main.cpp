@@ -73,8 +73,10 @@ int main(int argc, char** argv){
         Histogram histogram(image);
         // image.contrastStretching(50,200,0.2,2,0.2,25,250);
         cout << "drawing" << endl;
-        image = histogram.createImage();
-        image.show();
+        // image = histogram.createImage();
+        // image.show();
+        int filter[] = {-1,-1,-1,-1,8,-1,-1,-1,-1};
+        image.konvolusi(filter);
         drawImage(image);
         bmp.writeFile(image, "tes");
     }

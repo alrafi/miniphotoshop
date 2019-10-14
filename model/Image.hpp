@@ -112,6 +112,8 @@ public:
     Image rotasi180();
     //flipping
     Image flipping(int type);
+    //convolution
+    void konvolusi(int* filter);
     void show();
 };
 #endif
