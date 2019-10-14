@@ -12,5 +12,7 @@ class Histogram
 
         Histogram(Image& img, bool isNormal = false);
         Histogram(int size, unsigned char* data, bool isNormal = false);
+        void show();
+        Image createImage(int scale = 2);
 };
 #endif

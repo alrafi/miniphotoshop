@@ -721,3 +721,10 @@ Image Image :: flipping(int type){
     }
     return temp;
 }
+
+void Image::show() {
+    cout << "height: " << this->height << endl;
+    cout << "width: " << this->width << endl;
+    cout << "size: " << this->size << endl;
+    cout << "isColor: " << this->isColor << endl;
+}

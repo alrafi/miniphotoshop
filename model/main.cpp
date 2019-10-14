@@ -70,15 +70,11 @@ int main(int argc, char** argv){
         BMP bmp2(argv[1]);
         Image image;
         bmp.readFile(image);
-        if (!image.isColor) {
-            Histogram histogram(image);
-            cout << histogram.hist[50] << endl;
-        } else {
-            HistogramColor histogram(image);
-            cout << histogram.r->hist[218] << endl;
-        }
-        image.contrastStretching(50,200,0.2,2,0.2,25,250);
+        Histogram histogram(image);
+        // image.contrastStretching(50,200,0.2,2,0.2,25,250);
         cout << "drawing" << endl;
+        image = histogram.createImage();
+        image.show();
         drawImage(image);
         bmp.writeFile(image, "tes");
     }

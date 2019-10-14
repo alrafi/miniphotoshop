@@ -112,5 +112,6 @@ public:
     Image rotasi180();
     //flipping
     Image flipping(int type);
+    void show();
 };
 #endif

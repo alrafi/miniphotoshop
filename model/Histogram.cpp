@@ -1,5 +1,6 @@
 #include "Histogram.hpp"
 #include <math.h>
+#include <iostream>
 
 Histogram::Histogram(Image& img, bool isNormal){
     this->isNormal = isNormal;
@@ -51,4 +52,31 @@ Histogram::Histogram(int size, unsigned char* data, bool isNormal) {
     }
     this->variansi = temp / size;
     this->standarDeviasi = sqrt(this->variansi);
+}
+
+void Histogram::show() {
+    std::cout << "mean: " << this->mean << std::endl;
+    std::cout << "variansi: " << this->variansi << std::endl;
+    std::cout << "standar deviasi: " << this->standarDeviasi << std::endl;
+}
+
+Image Histogram::createImage(int scale) {
+    Image img;
+    img.width = scale * 256;
+    img.height = scale * 256;
+    img.updateSize();
+    img.isColor = false;
+    img.createGreyData();
+    int maks = 0;
+    for (int i=0; i < 256; i++) {
+        maks = maks < this->hist[i] ? this->hist[i] : maks;
+    }
+    for (int i=0; i < 256; i++) {
+        for (int k=0; k < this->hist[i]*img.height/maks ; k++){
+            for (int j=0; j<scale; j++) {
+                img.setGreyData((i*scale)+j,img.height - k,255);
+            }
+        }
+    }
+    return img;
 }
