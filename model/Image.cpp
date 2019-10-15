@@ -2,6 +2,8 @@
 #include <iostream>
 #include <math.h>
 #include "Histogram.hpp"
+#include <vector>
+#include <cstdlib>
 
 using namespace std;
 Image :: Image(){
@@ -504,6 +506,18 @@ Image Image :: operator&(Image image){
     return newImage;
 }
 
+void Image::tresholding(int t){
+    for (int i=0; i<this->size; i++){
+        if (this->isColor){
+            this->colorData[i].R = this->colorData[i].R>=t ? 255 : 0;
+            this->colorData[i].G = this->colorData[i].G>=t ? 255 : 0;
+            this->colorData[i].B = this->colorData[i].B>=t ? 255 : 0;
+        } else {
+            this->greyData[i] = this->greyData[i]>=t ? 255 : 0;
+        }
+    }
+}
+
 Image Image :: operator|(Image image){
     Image newImage;
     if ((this->isColor == true) && (image.isColor == true)){
@@ -722,17 +736,17 @@ Image Image :: flipping(int type){
     return temp;
 }
 
-void Image::konvolusi(int* filter){
-    int tempHeight = this->height-2; 
-    int tempWidth = this->width-2;
+void Image::konvolusi(float* filter, int n){
+    int tempHeight = this->height-n+1; 
+    int tempWidth = this->width-n+1;
     unsigned int* temp = new unsigned int[tempHeight * tempWidth];
     for (int i=0; i<tempHeight; i++){
         for (int j=0; j<tempWidth; j++){
             // operasi dot
             int sum=0;
-            for (int k=0;k<3;k++){
-                for (int l=0;l<3;l++){
-                    sum += filter[k*3 + l] * this->getGreyData(j+l,i+k);
+            for (int k=0;k<n;k++){
+                for (int l=0;l<n;l++){
+                    sum += filter[k*n + l] * this->getGreyData(j+l,i+k);
                 }
             }
             // clipping
@@ -740,11 +754,131 @@ void Image::konvolusi(int* filter){
             temp[i*tempHeight + j] = sum>255 ? 255 : sum;
         }
     }
+    int offset = (n-1)/2;
     for (int i=0; i<tempHeight; i++) {
         for (int j=0; j <tempWidth; j++){
-            this->setGreyData(j+1,i+1,temp[i*tempHeight + j]);
+            this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
         }
     }
+}
+
+void Image::konvolusi(float* filterX,float* filterY, int n){
+    int tempHeight = this->height-n+1; 
+    int tempWidth = this->width-n+1;
+    unsigned int* temp = new unsigned int[tempHeight * tempWidth];
+    for (int i=0; i<tempHeight; i++){
+        for (int j=0; j<tempWidth; j++){
+            // operasi dot
+            int sumX=0;
+            int sumY=0;
+            for (int k=0;k<n;k++){
+                for (int l=0;l<n;l++){
+                    sumX += filterX[k*n + l] * this->getGreyData(j+l,i+k);
+                    sumY += filterY[k*n + l] * this->getGreyData(j+l,i+k);
+                }
+            }
+            int sum = abs(sumX) + abs(sumY);
+            // clipping
+            sum = sum < 0 ? 0 : sum;
+            temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+        }
+    }
+    int offset = (n-1)/2;
+    for (int i=0; i<tempHeight; i++) {
+        for (int j=0; j <tempWidth; j++){
+            this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+        }
+    }
+}
+
+void Image::highPassFilter(int fil){
+    std::vector<float> filter;
+    switch (fil){
+    case 0:
+        filter = {-1,-1,-1,-1,8,-1,-1,-1,-1};
+        break;
+    case 1:
+        filter = {-1,-1,-1,-1,9,-1,-1,-1,-1};
+    case 2:
+        filter = {0,-1,0,-1,5,-1,0,-1,0};
+    case 3:
+        filter = {1,-2,1,-2,5,-2,1,-2,1};
+    case 4:
+        filter = {1,-2,1,-2,4,-2,1,-2,1};
+    case 5:
+        filter = {0,-1,0,-1,4,-1,0,-1,0};
+    default:
+        filter = {-1,-1,-1,-1,8,-1,-1,-1,-1};
+        break;
+    }
+    this->konvolusi(&filter[0]);
+}
+
+void Image::meanFilter(){
+    float filter[9] = {1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f};
+    this->konvolusi(filter);
+}
+
+void Image::gaussianSmoothing(){
+    float filter[9] = {1.0f/16.0f,2.0f/16.0f,1.0f/16.0f,2.0f/16.0f,4.0f/16.0f,2.0f/16.0f,1.0f/16.0f,2.0f/16.0f,1.0f/16.0f};
+    this->konvolusi(filter);
+}
+
+void Image::unsharpMasking(){
+    // lowpass menggunakan meanfilter
+    float filter[9] = {-1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, 17.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f};
+    this->konvolusi(filter); 
+}
+
+
+void Image::highBoost(float c){
+    // lowpass menggunakan meanfilter
+    float filter[9] = {-1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, 17.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c};
+    this->konvolusi(filter);
+}
+
+void Image::gaussian(){
+    float filterX[4] = {-1,1,-1,1};
+    float filterY[4] = {1,1,-1,-1};
+    this->konvolusi(filterX,filterY,2);
+}
+
+void Image::laplace(){
+    float filter[9] = {0,1,0,1,-4,1,0,1,0};
+    this->konvolusi(filter);
+}
+
+void Image::loG(){
+    float filter[25] = {0,0,-1,0,0,
+                        0,-1,-2,-1,0,
+                        -1,-2,16,-2,-1,
+                        0,-1,-2,-1,0,
+                        0,0,-1,0,0};
+    this->konvolusi(filter, 5);
+}
+
+void Image::sobel(){
+    float filterX[9] = {-1,0,1,-2,0,2,-1,0,1};
+    float filterY[9] = {1,2,1,0,0,0,-1,-2,-1};
+    this->konvolusi(filterX,filterY);
+}
+
+void Image::prewitt(){
+    float filterX[9] = {-1,0,1,-1,0,1,-1,0,1};
+    float filterY[9] = {1,1,1,0,0,0,-1,-1,-1};
+    this->konvolusi(filterX,filterY);
+}
+
+void Image::roberts(){
+    float filter1[4] = {1,0,0,-1};
+    float filter2[4] = {0,1,-1,0};
+    this->konvolusi(filter1,filter2);
+}
+
+void Image::canny(int t){
+    this->gaussianSmoothing();
+    this->sobel();
+    this->tresholding(t);
 }
 
 void Image::show() {

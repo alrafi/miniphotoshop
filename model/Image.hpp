@@ -96,6 +96,9 @@ public:
 
     //method color to grayscale
     void colorToGrayscale();
+
+    // method tresholding
+    void tresholding(int T);
     
     //operasi boolean
     //operasi and
@@ -113,7 +116,21 @@ public:
     //flipping
     Image flipping(int type);
     //convolution
-    void konvolusi(int* filter);
+    void konvolusi(float* filter, int n=3);
+    void konvolusi(float* filterX,float* filterY, int n=3);
+    void highPassFilter(int fil=0);
+    void meanFilter();
+    void gaussianSmoothing();
+    void unsharpMasking();
+    void highBoost(float c);
+    // edge detection
+    void gaussian();
+    void laplace();
+    void loG();
+    void sobel();
+    void prewitt();
+    void roberts(); 
+    void canny(int t);
     void show();
 };
 #endif

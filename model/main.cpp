@@ -73,10 +73,40 @@ int main(int argc, char** argv){
         Histogram histogram(image);
         // image.contrastStretching(50,200,0.2,2,0.2,25,250);
         cout << "drawing" << endl;
-        // image = histogram.createImage();
-        // image.show();
-        int filter[] = {-1,-1,-1,-1,8,-1,-1,-1,-1};
-        image.konvolusi(filter);
+        int c = stoi(argv[2]);
+        cout << c << endl;
+        switch (c)
+        {
+        case 0:
+            image.gaussianSmoothing();
+            break;
+        case 1:
+            image.tresholding(50);
+            break;
+        case 2:
+            image.gaussian();
+            break;
+        case 3:
+            image.laplace();
+            break;
+        case 4:
+            image.loG();
+            break;
+        case 5:
+            image.sobel();
+            break;
+        case 6:
+            image.prewitt();
+            break;
+        case 7:
+            image.roberts(); 
+            break;
+        case 8:
+            image.canny(stoi(argv[3])); 
+            break;
+        default:
+            break;
+        }
         drawImage(image);
         bmp.writeFile(image, "tes");
     }
