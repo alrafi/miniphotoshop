@@ -70,8 +70,6 @@ int main(int argc, char** argv){
         BMP bmp2(argv[1]);
         Image image;
         bmp.readFile(image);
-        Histogram histogram(image);
-        // image.contrastStretching(50,200,0.2,2,0.2,25,250);
         cout << "drawing" << endl;
         int c = stoi(argv[2]);
         cout << c << endl;

@@ -347,9 +347,9 @@ void Image::transformasiLog(float scalar){
 void Image::transformasiLogInv(float scalar){
     for (int i=0;i<this->size;i++) {
         if (this->isColor) {
-            int r = exp (1 + this->colorData[i].R) / scalar;
-            int g = exp (1 + this->colorData[i].G) / scalar;
-            int b = exp (1 + this->colorData[i].B) / scalar;
+            int r = exp (1 + this->colorData[i].R) * scalar;
+            int g = exp (1 + this->colorData[i].G) * scalar;
+            int b = exp (1 + this->colorData[i].B) * scalar;
             this->colorData[i].R = r > 255 ? 255 : r;
             this->colorData[i].G = g > 255 ? 255 : g;
             this->colorData[i].B = b > 255 ? 255 : b;
@@ -739,55 +739,119 @@ Image Image :: flipping(int type){
 void Image::konvolusi(float* filter, int n){
     int tempHeight = this->height-n+1; 
     int tempWidth = this->width-n+1;
-    unsigned int* temp = new unsigned int[tempHeight * tempWidth];
+    unsigned int* temp;
+    Color* tempC;
+    if (this->isColor){
+        tempC = new Color[tempHeight * tempWidth];
+    }else {
+        temp = new unsigned int[tempHeight * tempWidth];
+    }
     for (int i=0; i<tempHeight; i++){
         for (int j=0; j<tempWidth; j++){
             // operasi dot
             int sum=0;
+            int sumR=0,sumG=0,sumB=0;
             for (int k=0;k<n;k++){
                 for (int l=0;l<n;l++){
-                    sum += filter[k*n + l] * this->getGreyData(j+l,i+k);
+                    if (this->isColor){
+                        sumR += filter[k*n + l] * this->getColorData(j+l,i+k).R;
+                        sumG += filter[k*n + l] * this->getColorData(j+l,i+k).G;
+                        sumB += filter[k*n + l] * this->getColorData(j+l,i+k).B;
+                    }else {
+                        sum += filter[k*n + l] * this->getGreyData(j+l,i+k);
+                    }
                 }
             }
             // clipping
-            sum = sum < 0 ? 0 : sum;
-            temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+            if (this->isColor){
+                sumR = sumR < 0 ? 0 : sumR;
+                tempC[i*tempHeight + j].R = sumR>255 ? 255 : sumR;
+                sumG = sumG < 0 ? 0 : sumG;
+                tempC[i*tempHeight + j].G = sumG>255 ? 255 : sumG;
+                sumB = sumB < 0 ? 0 : sumB;
+                tempC[i*tempHeight + j].B = sumB>255 ? 255 : sumB;
+            }else {
+                sum = sum < 0 ? 0 : sum;
+                temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+            }
         }
     }
     int offset = (n-1)/2;
     for (int i=0; i<tempHeight; i++) {
         for (int j=0; j <tempWidth; j++){
-            this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+            if (this->isColor){
+                this->setColorData(j+offset,i+offset,tempC[i*tempHeight + j].R,tempC[i*tempHeight + j].G,tempC[i*tempHeight + j].B);
+            } else {
+                this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+            }
         }
+    }
+    if (this->isColor){
+        delete [] tempC;
+    }else {
+        delete [] temp; 
     }
 }
 
 void Image::konvolusi(float* filterX,float* filterY, int n){
     int tempHeight = this->height-n+1; 
     int tempWidth = this->width-n+1;
-    unsigned int* temp = new unsigned int[tempHeight * tempWidth];
+    unsigned int* temp;
+    Color* tempC;
+    if (this->isColor){
+        tempC = new Color[tempHeight * tempWidth];
+    }else {
+        temp = new unsigned int[tempHeight * tempWidth];
+    }
     for (int i=0; i<tempHeight; i++){
         for (int j=0; j<tempWidth; j++){
             // operasi dot
-            int sumX=0;
-            int sumY=0;
+            int sumX=0,sumY=0;
+            int sumXR=0,sumXG=0,sumXB=0;
+            int sumYR=0,sumYG=0,sumYB=0;
             for (int k=0;k<n;k++){
                 for (int l=0;l<n;l++){
-                    sumX += filterX[k*n + l] * this->getGreyData(j+l,i+k);
-                    sumY += filterY[k*n + l] * this->getGreyData(j+l,i+k);
+                    if (this->isColor){
+                        sumXR += filterX[k*n + l] * this->getColorData(j+l,i+k).R;
+                        sumXG += filterX[k*n + l] * this->getColorData(j+l,i+k).G;
+                        sumXB += filterX[k*n + l] * this->getColorData(j+l,i+k).B;
+                        sumYR += filterY[k*n + l] * this->getColorData(j+l,i+k).R;
+                        sumYG += filterY[k*n + l] * this->getColorData(j+l,i+k).G;
+                        sumYB += filterY[k*n + l] * this->getColorData(j+l,i+k).B;
+                    }else {
+                        sumX += filterX[k*n + l] * this->getGreyData(j+l,i+k);
+                        sumY += filterY[k*n + l] * this->getGreyData(j+l,i+k);
+                    }
                 }
             }
-            int sum = abs(sumX) + abs(sumY);
             // clipping
-            sum = sum < 0 ? 0 : sum;
-            temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+            if (this->isColor){
+                int sumR = abs(sumXR) + abs(sumYR);
+                tempC[i*tempHeight + j].R = sumR>255 ? 255 : sumR;
+                int sumG = abs(sumXG) + abs(sumYG);
+                tempC[i*tempHeight + j].G = sumG>255 ? 255 : sumG;
+                int sumB = abs(sumXB) + abs(sumYB);
+                tempC[i*tempHeight + j].B = sumB>255 ? 255 : sumB;
+            }else {
+                int sum = abs(sumX) + abs(sumY);
+                temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+            }
         }
     }
     int offset = (n-1)/2;
     for (int i=0; i<tempHeight; i++) {
         for (int j=0; j <tempWidth; j++){
-            this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+            if (this->isColor){
+                this->setColorData(j+offset,i+offset,tempC[i*tempHeight + j].R,tempC[i*tempHeight + j].G,tempC[i*tempHeight + j].B);
+            } else {
+                this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+            }
         }
+    }
+    if (this->isColor){
+        delete [] tempC;
+    }else {
+        delete [] temp; 
     }
 }
 
