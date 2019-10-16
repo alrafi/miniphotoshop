@@ -332,14 +332,14 @@ unsigned char* Image::getBlueData(){
 void Image::transformasiLog(float scalar){
     for (int i=0;i<this->size;i++) {
         if (this->isColor) {
-            int r = scalar * log (1 + this->colorData[i].R);
-            int g = scalar * log (1 + this->colorData[i].G);
-            int b = scalar * log (1 + this->colorData[i].B);
+            double r = scalar * log (1 + this->colorData[i].R);
+            double g = scalar * log (1 + this->colorData[i].G);
+            double b = scalar * log (1 + this->colorData[i].B);
             this->colorData[i].R = r > 255 ? 255 : r;
             this->colorData[i].G = g > 255 ? 255 : g;
             this->colorData[i].B = b > 255 ? 255 : b;
         } else {
-            int g = scalar * log(1 + this->greyData[i]);
+            double g = scalar * log(1 + this->greyData[i]);
             this->greyData[i] = g > 255 ? 255 : g;
         }
     }
@@ -347,15 +347,15 @@ void Image::transformasiLog(float scalar){
 void Image::transformasiLogInv(float scalar){
     for (int i=0;i<this->size;i++) {
         if (this->isColor) {
-            int r = exp (1 + this->colorData[i].R) * scalar;
-            int g = exp (1 + this->colorData[i].G) * scalar;
-            int b = exp (1 + this->colorData[i].B) * scalar;
+            double r = exp (1 + this->colorData[i].R) * scalar;
+            double g = exp (1 + this->colorData[i].G) * scalar;
+            double b = exp (1 + this->colorData[i].B) * scalar;
             this->colorData[i].R = r > 255 ? 255 : r;
             this->colorData[i].G = g > 255 ? 255 : g;
             this->colorData[i].B = b > 255 ? 255 : b;
         } else {
-            int g = exp(1 + this->greyData[i]) / scalar;
-            this->greyData[i] = g > 255 ? 255 : g;
+            double s = exp(1 + this->greyData[i]) * scalar;
+            this->greyData[i] = s > 255 ? 255 : s;
         }
     }
 }
@@ -944,6 +944,18 @@ void Image::canny(int t){
     this->sobel();
     this->tresholding(t);
 }
+
+
+// void Image::fourierTransform(){
+//     Image temp;
+//     temp = *this;
+//     for(int i=0; i<this->height; i++){
+//         for (int j=0; j<this->width; j++){
+//             temp.greyData[i*this->width + j] = 0;
+//             for (int k=0; k<this->width)
+//         }
+//     }
+// }
 
 void Image::show() {
     cout << "height: " << this->height << endl;

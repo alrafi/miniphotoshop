@@ -72,7 +72,6 @@ int main(int argc, char** argv){
         bmp.readFile(image);
         cout << "drawing" << endl;
         int c = stoi(argv[2]);
-        cout << c << endl;
         switch (c)
         {
         case 0:
@@ -101,6 +100,12 @@ int main(int argc, char** argv){
             break;
         case 8:
             image.canny(stoi(argv[3])); 
+            break;
+        case 9:
+            image.transformasiLog(stof(argv[3]));
+            break;
+        case 10:
+            image.transformasiLogInv(stof(argv[3]));
             break;
         default:
             break;

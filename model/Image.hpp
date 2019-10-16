@@ -131,6 +131,8 @@ public:
     void prewitt();
     void roberts(); 
     void canny(int t);
+    // transformasi fourier
+    void fourierTransform();
     void show();
 };
 #endif
