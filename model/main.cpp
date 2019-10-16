@@ -108,9 +108,11 @@ int main(int argc, char** argv){
             image.transformasiLogInv(stof(argv[3]));
             break;
         case 11:
-            image = image & 1<<stoi(argv[3]);
+            image.grayLevelSlicing();
+            break;
         case 12:
             image = image.bitPlaneSlicing()[stoi(argv[3])];
+            break;
         default:
             break;
         }
