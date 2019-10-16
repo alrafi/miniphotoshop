@@ -1,38 +1,122 @@
-<<<<<<< HEAD
-#include "PBM.hpp"
-=======
-#include "PPM.hpp"
->>>>>>> 9eb4a414bf502fbab35b76609000de4ee92987a5
+#include "BMP.hpp"
 #include <iostream>
+#include "Histogram.hpp"
+#include "HistogramColor.hpp"
+#include "Image.hpp"
+#include <SDL.h>
 
 using namespace std;
 
-int main(){
-<<<<<<< HEAD
-    PBM pbm("circle.ascii.pbm");
-    Image image;
-    pbm.readFile(image);
-=======
-    PPM ppm("blackbuck.ascii.ppm");
-    Image image;
-    ppm.readFile(image);
->>>>>>> 9eb4a414bf502fbab35b76609000de4ee92987a5
+void drawImage(Image& img) {
+    // window 
+    SDL_Window* window = NULL;
 
-    cout << image.width << endl;
-    cout << image.height << endl;
-    for(int i = 0; i<10; i++){
-<<<<<<< HEAD
-        if ((unsigned int) image.greyData[i] == 255){
-            cout << "0" << endl;
-        }else{
-            cout << "1" << endl;
-        }    
+    // surface contained in window
+    SDL_Surface* screenSurface = NULL;
+
+    // init SDL
+    if ( SDL_Init( SDL_INIT_VIDEO ) < 0) {
+        cout << "Could not initialize sdl" << SDL_GetError() << endl; 
+    } else {
+        // create window
+        window = SDL_CreateWindow( "SDL TUTORIAL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, img.width, img.height, SDL_WINDOW_SHOWN);
+        if (window == NULL) {
+            cout << "Could not initialize window" << SDL_GetError() << endl;
+        } else {
+            SDL_Renderer *renderer;
+            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+            for (int i = 0; i < img.width; i++) {
+                for (int j = 0; j < img.height; j++) {
+                    if (img.isColor) {
+                        Color c = img.getColorData(i,j);
+                        SDL_SetRenderDrawColor(renderer, c.R, c.G, c.B, 0);
+                    } else {
+                        int g = img.getGreyData(i,j);
+                        SDL_SetRenderDrawColor(renderer, g, g, g, 0);
+                    }
+                    SDL_RenderDrawPoint(renderer,j,i);
+                }
+            }
+            SDL_RenderPresent(renderer);
+            cout << "isColor: " << img.isColor << endl;
+
+            SDL_Delay(5000);
+
+            // destroy window
+            SDL_DestroyWindow(window);
+        }
+        // quit sdl subsystem
+        SDL_Quit();
     }
-    pbm.writeFile(image, "anjay2");
-=======
-        cout << (unsigned int) image.colorData[i].R << "  " << (unsigned int) image.colorData[i].G << "  " << (unsigned int) image.colorData[i].B << endl;
+}
+
+int main(int argc, char** argv){
+    // PGM pgm("baboon.ascii.pgm");
+    // Image image;
+    // pgm.readFile(image);
+
+    // cout << image.width << endl;
+    // cout << image.height << endl;
+    // for(int i = 0; i<10; i++){
+    //     cout << (unsigned int) image.greyData[i] << endl;
+    // }
+    // pgm.writeFile(image, "anjay");
+    if (argc < 2) {
+        cout << "error" << endl;
+    } else {
+        BMP bmp(argv[1]);
+        BMP bmp2(argv[1]);
+        Image image;
+        bmp.readFile(image);
+        cout << "drawing" << endl;
+        int c = stoi(argv[2]);
+        switch (c)
+        {
+        case 0:
+            image.gaussianSmoothing();
+            break;
+        case 1:
+            image.tresholding(50);
+            break;
+        case 2:
+            image.gaussian();
+            break;
+        case 3:
+            image.laplace();
+            break;
+        case 4:
+            image.loG();
+            break;
+        case 5:
+            image.sobel();
+            break;
+        case 6:
+            image.prewitt();
+            break;
+        case 7:
+            image.roberts(); 
+            break;
+        case 8:
+            image.canny(stoi(argv[3])); 
+            break;
+        case 9:
+            image.transformasiLog(stof(argv[3]));
+            break;
+        case 10:
+            image.transformasiLogInv(stof(argv[3]));
+            break;
+        case 11:
+            image = image & 1<<stoi(argv[3]);
+        case 12:
+            image = image.bitPlaneSlicing()[stoi(argv[3])];
+        default:
+            break;
+        }
+        drawImage(image);
+        bmp.writeFile(image, "tes");
     }
-    ppm.writeFile(image, "anjay1");
->>>>>>> 9eb4a414bf502fbab35b76609000de4ee92987a5
+
     return 0;
 }
