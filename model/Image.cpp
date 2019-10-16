@@ -377,6 +377,9 @@ void Image::transformasiPangkat(float scalar, float gamma){
 }
 
 Image* Image::bitPlaneSlicing(){
+    if (this->isColor){
+        this->colorToGrayscale();
+    }
     Image* plane = new Image[8];
     for (int i=0; i<8; i++){
         plane[i] = *this & (1<<i);
@@ -476,7 +479,8 @@ void Image :: brightnessColorscale(int b){
 }
 
 void Image :: colorToGrayscale(){
-    if(colorData != NULL){
+    if(this->isColor){
+        this->isColor = false;
         createGreyData();
         for(int i=0; i<size; i++){
             int gray = (0.3* (int) colorData[i].R + 0.59 * (int)colorData[i].G + 0.11 * (int)colorData[i].B);
@@ -487,6 +491,9 @@ void Image :: colorToGrayscale(){
 
 void Image::grayLevelSlicing()
 {
+    if (this->isColor){
+        this->colorToGrayscale();
+    }
     for (int i = 0; i < this->size; i++)
     {
         if ( this->greyData[i] > 142 && this->greyData[i] < 250)
