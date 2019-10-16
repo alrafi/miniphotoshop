@@ -376,6 +376,15 @@ void Image::transformasiPangkat(float scalar, float gamma){
     }
 }
 
+Image* Image::bitPlaneSlicing(){
+    Image* plane = new Image[8];
+    for (int i=0; i<8; i++){
+        plane[i] = *this & (1<<i);
+        plane[i].tresholding(1);
+    }
+    return plane;
+}
+
 void Image::contrastStretching(int a, int b,float alpha, float beta, float gamma, int ya, int yb){
     if (this->isColor) {
         for (int i=0; i<this->size; i++) {
@@ -483,6 +492,7 @@ Image Image :: operator&(Image image){
             newImage.setWidth(this->width);
             newImage.setHeight(this->height);
             newImage.updateSize();
+            newImage.isColor = this->isColor;
             newImage.createColorData();
             for(int i=0; i < this->size; i++){
                 unsigned char r = this->getColorDataByIndex(i).R & image.getColorDataByIndex(i).R;
@@ -495,12 +505,37 @@ Image Image :: operator&(Image image){
         if(this->width == image.width && this->height == image.height){
             newImage.setWidth(this->width);
             newImage.setHeight(this->height);
+            newImage.isColor = this->isColor;
             newImage.updateSize();
             newImage.createGreyData();
             for(int i=0; i < this->size; i++){
                 unsigned char c = this->getGreyDataByIndex(i) & image.getGreyDataByIndex(i);
                 newImage.setGreyDataByIndex(i, c);
             }
+        }
+    }
+    return newImage;
+}
+
+Image Image :: operator&(unsigned char scalar){
+    Image newImage;
+    newImage.setWidth(this->width);
+    newImage.setHeight(this->height);
+    newImage.updateSize();
+    newImage.isColor = this->isColor;
+    if (this->isColor){
+        newImage.createColorData();
+        for(int i=0; i < this->size; i++){
+            unsigned char r = this->getColorDataByIndex(i).R & scalar;
+            unsigned char g = this->getColorDataByIndex(i).G & scalar;
+            unsigned char b = this->getColorDataByIndex(i).B & scalar;
+            newImage.setColorDataByIndex(i, r, g, b);
+        }
+    }else {
+        newImage.createGreyData();
+        for(int i=0; i < this->size; i++){
+            unsigned char c = this->getGreyDataByIndex(i) & scalar;
+            newImage.setGreyDataByIndex(i, c);
         }
     }
     return newImage;
@@ -525,6 +560,7 @@ Image Image :: operator|(Image image){
             newImage.setWidth(this->width);
             newImage.setHeight(this->height);
             newImage.updateSize();
+            newImage.isColor = this->isColor;
             newImage.createColorData();
             for(int i=0; i < this->size; i++){
                 unsigned char r = this->getColorDataByIndex(i).R | image.getColorDataByIndex(i).R;
@@ -538,6 +574,7 @@ Image Image :: operator|(Image image){
             newImage.setWidth(this->width);
             newImage.setHeight(this->height);
             newImage.updateSize();
+            newImage.isColor = this->isColor;
             newImage.createGreyData();
             for(int i=0; i < this->size; i++){
                 unsigned char c = this->getGreyDataByIndex(i) | image.getGreyDataByIndex(i);
@@ -944,18 +981,6 @@ void Image::canny(int t){
     this->sobel();
     this->tresholding(t);
 }
-
-
-// void Image::fourierTransform(){
-//     Image temp;
-//     temp = *this;
-//     for(int i=0; i<this->height; i++){
-//         for (int j=0; j<this->width; j++){
-//             temp.greyData[i*this->width + j] = 0;
-//             for (int k=0; k<this->width)
-//         }
-//     }
-// }
 
 void Image::show() {
     cout << "height: " << this->height << endl;

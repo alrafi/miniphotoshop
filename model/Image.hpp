@@ -80,6 +80,9 @@ public:
     void transformasiLogInv(float scalar);
     void transformasiPangkat(float scalar, float gamma);
 
+    // bit plane slicing
+    Image* bitPlaneSlicing();
+
     // contrast stretching
     void contrastStretching(int a, int b,float alpha, float beta, float gamma, int ya, int yb);
     //menthod grayscale citra negative
@@ -103,8 +106,10 @@ public:
     //operasi boolean
     //operasi and
     Image operator&(Image image);
+    Image operator&(unsigned char scalar);
     //operasi or
     Image operator|(Image image);
+    Image operator|(unsigned char scalar);
     //operasi not
     Image& operator~();
 
@@ -131,8 +136,6 @@ public:
     void prewitt();
     void roberts(); 
     void canny(int t);
-    // transformasi fourier
-    void fourierTransform();
     void show();
 };
 #endif
