@@ -1107,6 +1107,29 @@ Image Image::zoomIn()
     Image *temp = new Image();
     if (this->isColor)
     { // citra berwarna
+        temp->isColor = true;
+        temp->setWidth(this->width * 2);
+        temp->setHeight(this->height * 2);
+        temp->updateSize();
+        temp->createColorData();
+        int m = 0;
+        int n = 0;
+        for (int i = 0; i < this->width; i++)
+        {
+            for (int j = 0; j < this->height; j++)
+            {
+                unsigned char r = getColorData(i, j).R;
+                unsigned char g = getColorData(i, j).G;
+                unsigned char b = getColorData(i, j).B;
+                temp->setColorData(m, n, r, g, b);
+                temp->setColorData(m, n + 1, r, g, b);
+                temp->setColorData(m + 1, n, r, g, b);
+                temp->setColorData(m + 1, n + 1, r, g, b);
+                n = n + 2;
+            }
+            m = m + 2;
+            n = 0;
+        }
     }
     else
     { // citra abu
