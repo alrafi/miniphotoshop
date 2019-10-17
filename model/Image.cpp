@@ -1160,6 +1160,68 @@ Image Image::zoomIn()
 // zoom out
 Image Image::zoomOut()
 {
+    Image *temp = new Image();
+    if (this->isColor)
+    {
+        temp->isColor = true;
+        temp->setWidth(this->width / 2);
+        temp->setHeight(this->height / 2);
+        temp->updateSize();
+        temp->createColorData();
+        int m = 0;
+        int n = 0;
+        for (int i = 0; i < temp->width; i++)
+        {
+            for (int j = 0; j < temp->height; j++)
+            {
+                unsigned char p1_1_r = this->getColorData(m, n).R;
+                unsigned char p1_2_r = this->getColorData(m, n + 1).R;
+                unsigned char p2_1_r = this->getColorData(m + 1, n).R;
+                unsigned char p2_2_r = this->getColorData(m + 1, n + 1).R;
+                unsigned char p1_1_g = this->getColorData(m, n).G;
+                unsigned char p1_2_g = this->getColorData(m, n + 1).G;
+                unsigned char p2_1_g = this->getColorData(m + 1, n).G;
+                unsigned char p2_2_g = this->getColorData(m + 1, n + 1).G;
+                unsigned char p1_1_b = this->getColorData(m, n).B;
+                unsigned char p1_2_b = this->getColorData(m, n + 1).B;
+                unsigned char p2_1_b = this->getColorData(m + 1, n).B;
+                unsigned char p2_2_b = this->getColorData(m + 1, n + 1).B;
+                int meanPixelR = (p1_1_r + p1_2_r + p2_1_r + p2_2_r) / 4;
+                int meanPixelG = (p1_1_g + p1_2_g + p2_1_g + p2_2_g) / 4;
+                int meanPixelB = (p1_1_b + p1_2_b + p2_1_b + p2_2_b) / 4;
+                temp->setColorData(i, j, meanPixelR, meanPixelG, meanPixelB);
+                n = n + 2;
+            }
+            m = m + 2;
+            n = 0;
+        }
+    }
+    else
+    {
+        temp->isColor = false;
+        temp->setWidth(this->width / 2);
+        temp->setHeight(this->height / 2);
+        temp->updateSize();
+        temp->createGreyData();
+        int m = 0;
+        int n = 0;
+        for (int i = 0; i < temp->width; i++)
+        {
+            for (int j = 0; j < temp->height; j++)
+            {
+                unsigned char p1_1 = this->getGreyData(m, n);
+                unsigned char p1_2 = this->getGreyData(m, n + 1);
+                unsigned char p2_1 = this->getGreyData(m + 1, n);
+                unsigned char p2_2 = this->getGreyData(m + 1, n + 1);
+                int meanPixel = (p1_1 + p1_2 + p2_1 + p2_2) / 4;
+                temp->setGreyData(i, j, meanPixel);
+                n = n + 2;
+            }
+            m = m + 2;
+            n = 0;
+        }
+    }
+    return *temp;
 }
 
 void Image::konvolusi(float *filter, int n)
