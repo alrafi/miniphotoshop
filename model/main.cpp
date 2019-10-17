@@ -72,6 +72,7 @@ int main(int argc, char** argv){
         bmp.readFile(image);
         cout << "drawing" << endl;
         int c = stoi(argv[2]);
+        HistogramColor hist(image);
         switch (c)
         {
         case 0:
@@ -111,7 +112,15 @@ int main(int argc, char** argv){
             image.grayLevelSlicing();
             break;
         case 12:
-            image = image.bitPlaneSlicing()[stoi(argv[3])];
+            Image* imgs;
+            imgs = image.bitPlaneSlicing();
+            drawImage(imgs[stoi(argv[3])]);
+            break;
+        case 13:
+            image.transformFourier();
+            break;
+        case 14:
+            image = hist.r->createImage();
             break;
         default:
             break;
