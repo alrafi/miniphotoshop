@@ -81,7 +81,7 @@ public:
     void transformasiPangkat(float scalar, float gamma);
 
     // bit plane slicing
-    Image* bitPlaneSlicing();
+    Image *bitPlaneSlicing();
 
     // contrast stretching
     void contrastStretching(int a, int b, float alpha, float beta, float gamma, int ya, int yb);
@@ -102,7 +102,7 @@ public:
 
     // method tresholding
     void tresholding(int T);
-    
+
     // method gray level slicing
     void grayLevelSlicing();
 
@@ -123,10 +123,16 @@ public:
     Image rotasi180();
     //flipping
     Image flipping(int type);
+    // Translasi
+    Image translasi(int x, int y);
+    // zoom in
+    Image zoomIn();
+    // zoom out
+    Image zoomOut();
     //convolution
-    void konvolusi(float* filter, int n=3);
-    void konvolusi(float* filterX,float* filterY, int n=3);
-    void highPassFilter(int fil=0);
+    void konvolusi(float *filter, int n = 3);
+    void konvolusi(float *filterX, float *filterY, int n = 3);
+    void highPassFilter(int fil = 0);
     void meanFilter();
     void gaussianSmoothing();
     void unsharpMasking();
@@ -137,7 +143,7 @@ public:
     void loG();
     void sobel();
     void prewitt();
-    void roberts(); 
+    void roberts();
     void canny(int t);
     // transformasi fourier
     void transformFourier();
