@@ -981,216 +981,288 @@ Image Image ::flipping(int type)
     return temp;
 }
 
-void Image::konvolusi(float* filter, int n){
-    int tempHeight = this->height-n+1; 
-    int tempWidth = this->width-n+1;
-    unsigned int* temp;
-    Color* tempC;
-    if (this->isColor){
+// translasi
+Image Image::translasi(int x, int y)
+{
+    Image temp;
+    temp.createGreyData();
+    for (int i = 0; i < (this->width) - 1; i++)
+    {
+        for (int j = 0; j < (this->height) - 1; j++)
+        {
+            temp.setGreyData(i, j, this->getGreyData(i + x, j + y))
+        }
+    }
+    return temp;
+}
+
+void Image::konvolusi(float *filter, int n)
+{
+    int tempHeight = this->height - n + 1;
+    int tempWidth = this->width - n + 1;
+    unsigned int *temp;
+    Color *tempC;
+    if (this->isColor)
+    {
         tempC = new Color[tempHeight * tempWidth];
-    }else {
+    }
+    else
+    {
         temp = new unsigned int[tempHeight * tempWidth];
     }
-    for (int i=0; i<tempHeight; i++){
-        for (int j=0; j<tempWidth; j++){
+    for (int i = 0; i < tempHeight; i++)
+    {
+        for (int j = 0; j < tempWidth; j++)
+        {
             // operasi dot
-            int sum=0;
-            int sumR=0,sumG=0,sumB=0;
-            for (int k=0;k<n;k++){
-                for (int l=0;l<n;l++){
-                    if (this->isColor){
-                        sumR += filter[k*n + l] * this->getColorData(j+l,i+k).R;
-                        sumG += filter[k*n + l] * this->getColorData(j+l,i+k).G;
-                        sumB += filter[k*n + l] * this->getColorData(j+l,i+k).B;
-                    }else {
-                        sum += filter[k*n + l] * this->getGreyData(j+l,i+k);
+            int sum = 0;
+            int sumR = 0, sumG = 0, sumB = 0;
+            for (int k = 0; k < n; k++)
+            {
+                for (int l = 0; l < n; l++)
+                {
+                    if (this->isColor)
+                    {
+                        sumR += filter[k * n + l] * this->getColorData(j + l, i + k).R;
+                        sumG += filter[k * n + l] * this->getColorData(j + l, i + k).G;
+                        sumB += filter[k * n + l] * this->getColorData(j + l, i + k).B;
+                    }
+                    else
+                    {
+                        sum += filter[k * n + l] * this->getGreyData(j + l, i + k);
                     }
                 }
             }
             // clipping
-            if (this->isColor){
+            if (this->isColor)
+            {
                 sumR = sumR < 0 ? 0 : sumR;
-                tempC[i*tempHeight + j].R = sumR>255 ? 255 : sumR;
+                tempC[i * tempHeight + j].R = sumR > 255 ? 255 : sumR;
                 sumG = sumG < 0 ? 0 : sumG;
-                tempC[i*tempHeight + j].G = sumG>255 ? 255 : sumG;
+                tempC[i * tempHeight + j].G = sumG > 255 ? 255 : sumG;
                 sumB = sumB < 0 ? 0 : sumB;
-                tempC[i*tempHeight + j].B = sumB>255 ? 255 : sumB;
-            }else {
+                tempC[i * tempHeight + j].B = sumB > 255 ? 255 : sumB;
+            }
+            else
+            {
                 sum = sum < 0 ? 0 : sum;
-                temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+                temp[i * tempHeight + j] = sum > 255 ? 255 : sum;
             }
         }
     }
-    int offset = (n-1)/2;
-    for (int i=0; i<tempHeight; i++) {
-        for (int j=0; j <tempWidth; j++){
-            if (this->isColor){
-                this->setColorData(j+offset,i+offset,tempC[i*tempHeight + j].R,tempC[i*tempHeight + j].G,tempC[i*tempHeight + j].B);
-            } else {
-                this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+    int offset = (n - 1) / 2;
+    for (int i = 0; i < tempHeight; i++)
+    {
+        for (int j = 0; j < tempWidth; j++)
+        {
+            if (this->isColor)
+            {
+                this->setColorData(j + offset, i + offset, tempC[i * tempHeight + j].R, tempC[i * tempHeight + j].G, tempC[i * tempHeight + j].B);
+            }
+            else
+            {
+                this->setGreyData(j + offset, i + offset, temp[i * tempHeight + j]);
             }
         }
     }
-    if (this->isColor){
-        delete [] tempC;
-    }else {
-        delete [] temp; 
+    if (this->isColor)
+    {
+        delete[] tempC;
+    }
+    else
+    {
+        delete[] temp;
     }
 }
 
-void Image::konvolusi(float* filterX,float* filterY, int n){
-    int tempHeight = this->height-n+1; 
-    int tempWidth = this->width-n+1;
-    unsigned int* temp;
-    Color* tempC;
-    if (this->isColor){
+void Image::konvolusi(float *filterX, float *filterY, int n)
+{
+    int tempHeight = this->height - n + 1;
+    int tempWidth = this->width - n + 1;
+    unsigned int *temp;
+    Color *tempC;
+    if (this->isColor)
+    {
         tempC = new Color[tempHeight * tempWidth];
-    }else {
+    }
+    else
+    {
         temp = new unsigned int[tempHeight * tempWidth];
     }
-    for (int i=0; i<tempHeight; i++){
-        for (int j=0; j<tempWidth; j++){
+    for (int i = 0; i < tempHeight; i++)
+    {
+        for (int j = 0; j < tempWidth; j++)
+        {
             // operasi dot
-            int sumX=0,sumY=0;
-            int sumXR=0,sumXG=0,sumXB=0;
-            int sumYR=0,sumYG=0,sumYB=0;
-            for (int k=0;k<n;k++){
-                for (int l=0;l<n;l++){
-                    if (this->isColor){
-                        sumXR += filterX[k*n + l] * this->getColorData(j+l,i+k).R;
-                        sumXG += filterX[k*n + l] * this->getColorData(j+l,i+k).G;
-                        sumXB += filterX[k*n + l] * this->getColorData(j+l,i+k).B;
-                        sumYR += filterY[k*n + l] * this->getColorData(j+l,i+k).R;
-                        sumYG += filterY[k*n + l] * this->getColorData(j+l,i+k).G;
-                        sumYB += filterY[k*n + l] * this->getColorData(j+l,i+k).B;
-                    }else {
-                        sumX += filterX[k*n + l] * this->getGreyData(j+l,i+k);
-                        sumY += filterY[k*n + l] * this->getGreyData(j+l,i+k);
+            int sumX = 0, sumY = 0;
+            int sumXR = 0, sumXG = 0, sumXB = 0;
+            int sumYR = 0, sumYG = 0, sumYB = 0;
+            for (int k = 0; k < n; k++)
+            {
+                for (int l = 0; l < n; l++)
+                {
+                    if (this->isColor)
+                    {
+                        sumXR += filterX[k * n + l] * this->getColorData(j + l, i + k).R;
+                        sumXG += filterX[k * n + l] * this->getColorData(j + l, i + k).G;
+                        sumXB += filterX[k * n + l] * this->getColorData(j + l, i + k).B;
+                        sumYR += filterY[k * n + l] * this->getColorData(j + l, i + k).R;
+                        sumYG += filterY[k * n + l] * this->getColorData(j + l, i + k).G;
+                        sumYB += filterY[k * n + l] * this->getColorData(j + l, i + k).B;
+                    }
+                    else
+                    {
+                        sumX += filterX[k * n + l] * this->getGreyData(j + l, i + k);
+                        sumY += filterY[k * n + l] * this->getGreyData(j + l, i + k);
                     }
                 }
             }
             // clipping
-            if (this->isColor){
+            if (this->isColor)
+            {
                 int sumR = abs(sumXR) + abs(sumYR);
-                tempC[i*tempHeight + j].R = sumR>255 ? 255 : sumR;
+                tempC[i * tempHeight + j].R = sumR > 255 ? 255 : sumR;
                 int sumG = abs(sumXG) + abs(sumYG);
-                tempC[i*tempHeight + j].G = sumG>255 ? 255 : sumG;
+                tempC[i * tempHeight + j].G = sumG > 255 ? 255 : sumG;
                 int sumB = abs(sumXB) + abs(sumYB);
-                tempC[i*tempHeight + j].B = sumB>255 ? 255 : sumB;
-            }else {
+                tempC[i * tempHeight + j].B = sumB > 255 ? 255 : sumB;
+            }
+            else
+            {
                 int sum = abs(sumX) + abs(sumY);
-                temp[i*tempHeight + j] = sum>255 ? 255 : sum;
+                temp[i * tempHeight + j] = sum > 255 ? 255 : sum;
             }
         }
     }
-    int offset = (n-1)/2;
-    for (int i=0; i<tempHeight; i++) {
-        for (int j=0; j <tempWidth; j++){
-            if (this->isColor){
-                this->setColorData(j+offset,i+offset,tempC[i*tempHeight + j].R,tempC[i*tempHeight + j].G,tempC[i*tempHeight + j].B);
-            } else {
-                this->setGreyData(j+offset,i+offset,temp[i*tempHeight + j]);
+    int offset = (n - 1) / 2;
+    for (int i = 0; i < tempHeight; i++)
+    {
+        for (int j = 0; j < tempWidth; j++)
+        {
+            if (this->isColor)
+            {
+                this->setColorData(j + offset, i + offset, tempC[i * tempHeight + j].R, tempC[i * tempHeight + j].G, tempC[i * tempHeight + j].B);
+            }
+            else
+            {
+                this->setGreyData(j + offset, i + offset, temp[i * tempHeight + j]);
             }
         }
     }
-    if (this->isColor){
-        delete [] tempC;
-    }else {
-        delete [] temp; 
+    if (this->isColor)
+    {
+        delete[] tempC;
+    }
+    else
+    {
+        delete[] temp;
     }
 }
 
-void Image::highPassFilter(int fil){
+void Image::highPassFilter(int fil)
+{
     std::vector<float> filter;
-    switch (fil){
+    switch (fil)
+    {
     case 0:
-        filter = {-1,-1,-1,-1,8,-1,-1,-1,-1};
+        filter = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
         break;
     case 1:
-        filter = {-1,-1,-1,-1,9,-1,-1,-1,-1};
+        filter = {-1, -1, -1, -1, 9, -1, -1, -1, -1};
     case 2:
-        filter = {0,-1,0,-1,5,-1,0,-1,0};
+        filter = {0, -1, 0, -1, 5, -1, 0, -1, 0};
     case 3:
-        filter = {1,-2,1,-2,5,-2,1,-2,1};
+        filter = {1, -2, 1, -2, 5, -2, 1, -2, 1};
     case 4:
-        filter = {1,-2,1,-2,4,-2,1,-2,1};
+        filter = {1, -2, 1, -2, 4, -2, 1, -2, 1};
     case 5:
-        filter = {0,-1,0,-1,4,-1,0,-1,0};
+        filter = {0, -1, 0, -1, 4, -1, 0, -1, 0};
     default:
-        filter = {-1,-1,-1,-1,8,-1,-1,-1,-1};
+        filter = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
         break;
     }
     this->konvolusi(&filter[0]);
 }
 
-void Image::meanFilter(){
-    float filter[9] = {1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f,1.0f/9.0f};
+void Image::meanFilter()
+{
+    float filter[9] = {1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f};
     this->konvolusi(filter);
 }
 
-void Image::gaussianSmoothing(){
-    float filter[9] = {1.0f/16.0f,2.0f/16.0f,1.0f/16.0f,2.0f/16.0f,4.0f/16.0f,2.0f/16.0f,1.0f/16.0f,2.0f/16.0f,1.0f/16.0f};
+void Image::gaussianSmoothing()
+{
+    float filter[9] = {1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f, 2.0f / 16.0f, 4.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f};
     this->konvolusi(filter);
 }
 
-void Image::unsharpMasking(){
+void Image::unsharpMasking()
+{
     // lowpass menggunakan meanfilter
-    float filter[9] = {-1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, 17.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f, -1.0f/9.0f};
-    this->konvolusi(filter); 
+    float filter[9] = {-1.0f / 9.0f, -1.0f / 9.0f, -1.0f / 9.0f, -1.0f / 9.0f, 17.0f / 9.0f, -1.0f / 9.0f, -1.0f / 9.0f, -1.0f / 9.0f, -1.0f / 9.0f};
+    this->konvolusi(filter);
 }
 
-
-void Image::highBoost(float c){
+void Image::highBoost(float c)
+{
     // lowpass menggunakan meanfilter
-    float filter[9] = {-1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, 17.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c, -1.0f/9.0f*c};
+    float filter[9] = {-1.0f / 9.0f * c, -1.0f / 9.0f * c, -1.0f / 9.0f * c, -1.0f / 9.0f * c, 17.0f / 9.0f * c, -1.0f / 9.0f * c, -1.0f / 9.0f * c, -1.0f / 9.0f * c, -1.0f / 9.0f * c};
     this->konvolusi(filter);
 }
 
-void Image::gaussian(){
-    float filterX[4] = {-1,1,-1,1};
-    float filterY[4] = {1,1,-1,-1};
-    this->konvolusi(filterX,filterY,2);
+void Image::gaussian()
+{
+    float filterX[4] = {-1, 1, -1, 1};
+    float filterY[4] = {1, 1, -1, -1};
+    this->konvolusi(filterX, filterY, 2);
 }
 
-void Image::laplace(){
-    float filter[9] = {0,1,0,1,-4,1,0,1,0};
+void Image::laplace()
+{
+    float filter[9] = {0, 1, 0, 1, -4, 1, 0, 1, 0};
     this->konvolusi(filter);
 }
 
-void Image::loG(){
-    float filter[25] = {0,0,-1,0,0,
-                        0,-1,-2,-1,0,
-                        -1,-2,16,-2,-1,
-                        0,-1,-2,-1,0,
-                        0,0,-1,0,0};
+void Image::loG()
+{
+    float filter[25] = {0, 0, -1, 0, 0,
+                        0, -1, -2, -1, 0,
+                        -1, -2, 16, -2, -1,
+                        0, -1, -2, -1, 0,
+                        0, 0, -1, 0, 0};
     this->konvolusi(filter, 5);
 }
 
-void Image::sobel(){
-    float filterX[9] = {-1,0,1,-2,0,2,-1,0,1};
-    float filterY[9] = {1,2,1,0,0,0,-1,-2,-1};
-    this->konvolusi(filterX,filterY);
+void Image::sobel()
+{
+    float filterX[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    float filterY[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    this->konvolusi(filterX, filterY);
 }
 
-void Image::prewitt(){
-    float filterX[9] = {-1,0,1,-1,0,1,-1,0,1};
-    float filterY[9] = {1,1,1,0,0,0,-1,-1,-1};
-    this->konvolusi(filterX,filterY);
+void Image::prewitt()
+{
+    float filterX[9] = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
+    float filterY[9] = {1, 1, 1, 0, 0, 0, -1, -1, -1};
+    this->konvolusi(filterX, filterY);
 }
 
-void Image::roberts(){
-    float filter1[4] = {1,0,0,-1};
-    float filter2[4] = {0,1,-1,0};
-    this->konvolusi(filter1,filter2);
+void Image::roberts()
+{
+    float filter1[4] = {1, 0, 0, -1};
+    float filter2[4] = {0, 1, -1, 0};
+    this->konvolusi(filter1, filter2);
 }
 
-void Image::canny(int t){
+void Image::canny(int t)
+{
     this->gaussianSmoothing();
     this->sobel();
     this->tresholding(t);
 }
 
-void Image::show() {
+void Image::show()
+{
     cout << "height: " << this->height << endl;
     cout << "width: " << this->width << endl;
     cout << "size: " << this->size << endl;
