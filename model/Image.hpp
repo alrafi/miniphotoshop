@@ -101,7 +101,7 @@ public:
     void colorToGrayscale();
 
     // method tresholding
-    // void tresholding(int T);
+    void tresholding(int T);
 
     // method gray level slicing
     void grayLevelSlicing();
@@ -125,6 +125,10 @@ public:
     Image flipping(int type);
     // Translasi
     Image translasi(int x, int y);
+    // zoom in
+    Image zoomIn();
+    // zoom out
+    Image zoomOut();
     //convolution
     void konvolusi(float *filter, int n = 3);
     void konvolusi(float *filterX, float *filterY, int n = 3);
