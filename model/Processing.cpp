@@ -63,64 +63,141 @@ void Processing::perataanHistogram(Image &image)
 }
 // end of Perataan Histogram
 
-// Spesifikasi histogram
-void Processing::spesifikasiHistogram(Image &image, Histogram &spec)
+// Spesifikasi histogram for color image
+void Processing::spesifikasiHistogram(Image &image, HistogramColor &spec)
 {
-    if (image.isColor)
+    float sum_r, sum_g, sum_b;
+    int minj_r, minj_g, minj_b;
+    int minval_r, minval_g, minval_b;
+    int HistEq_r[256], HistEq_g[256], HistEq_b[256];
+    int SpecEq_r[256], SpecEq_g[256], SpecEq_b[256];
+    int InvHist_r[256], InvHist_g[256], InvHist_b[256];
+
+    HistogramColor colorHist(image, true);
+    for (int i = 0; i < 256; i++)
     {
-        float sum;
-        int minj, minval, HistEq[256], SpecEq[256], InvHist[256];
+        sum_r = 0.0;
+        sum_g = 0.0;
+        sum_b = 0.0;
+        for (int j = 0; j <= i; j++)
+        {
+            sum_r += colorHist.r->hist[j];
+            sum_g += colorHist.g->hist[j];
+            sum_b += colorHist.b->hist[j];
+        }
+        HistEq_r[i] = floor(255 * sum_r);
+        HistEq_g[i] = floor(255 * sum_g);
+        HistEq_b[i] = floor(255 * sum_b);
     }
-    else
+
+    // perataan histogram untuk citra spec
+    for (int i = 0; i < 256; i++)
     {
-
-        float sum;
-        int minj, minval, HistEq[256], SpecEq[256], InvHist[256];
-        Histogram newHist(image, true);
-        for (int i = 0; i < 256; i++)
+        sum_r = 0.0;
+        sum_g = 0.0;
+        sum_b = 0.0;
+        for (int j = 0; j <= i; j++)
         {
-            sum = 0.0;
-            for (int j = 0; j <= i; j++)
+            sum_r += spec.r->hist[j];
+            sum_g += spec.g->hist[j];
+            sum_b += spec.b->hist[j];
+        }
+        SpecEq_r[i] = floor(255 * sum_r);
+        SpecEq_g[i] = floor(255 * sum_g);
+        SpecEq_b[i] = floor(255 * sum_b);
+    }
+
+    // melakukan tranformasi balikan
+    for (int i = 0; i < image.width; i++)
+    {
+        minval_r = abs(HistEq_r[i] - SpecEq_r[0]);
+        minval_g = abs(HistEq_g[i] - SpecEq_g[0]);
+        minval_b = abs(HistEq_b[i] - SpecEq_b[0]);
+        minj_r = 0;
+        minj_g = 0;
+        minj_b = 0;
+        for (int j = 0; j < 256; j++)
+        {
+            if (abs(HistEq_r[i] - SpecEq_r[j]) < minval_r)
             {
-                sum += newHist.hist[j];
+                minval_r = abs(HistEq_r[i] - SpecEq_r[j]);
+                minj_r = j;
             }
-            HistEq[i] = floor(255 * sum);
-        }
-
-        // perataan histogram untuk citra spec
-        for (int i = 0; i < 256; i++)
-        {
-            sum = 0.0;
-            for (int j = 0; j <= i; j++)
+            if (abs(HistEq_g[i] - SpecEq_g[j]) < minval_g)
             {
-                sum += spec.hist[j];
+                minval_g = abs(HistEq_g[i] - SpecEq_g[j]);
+                minj_g = j;
             }
-            SpecEq[i] = floor(255 * sum);
-        }
-
-        // melakukan tranformasi balikan
-        for (int i = 0; i < image.width; i++)
-        {
-            minval = abs(HistEq[i] - SpecEq[0]);
-            minj = 0;
-            for (int j = 0; j < 256; j++)
+            if (abs(HistEq_b[i] - SpecEq_b[j]) < minval_b)
             {
-                if (abs(HistEq[i] - SpecEq[j]) < minval)
-                {
-                    minval = abs(HistEq[i] - SpecEq[j]);
-                    minj = j;
-                }
+                minval_b = abs(HistEq_b[i] - SpecEq_b[j]);
+                minj_b = j;
             }
-            InvHist[i] = minj;
         }
+        InvHist_r[i] = minj_r;
+        InvHist_g[i] = minj_g;
+        InvHist_b[i] = minj_b;
+    }
 
-        // update citra setelah pembentukan histogram
-        for (int i = 0; i < image.size; i++)
-        {
-            image.setGreyDataByIndex(i, InvHist[image.greyData[i]]);
-        }
+    // update citra setelah pembentukan histogram
+    for (int i = 0; i < image.size; i++)
+    {
+        unsigned char r = image.getColorDataByIndex(i).R;
+        unsigned char g = image.getColorDataByIndex(i).G;
+        unsigned char b = image.getColorDataByIndex(i).B;
+        image.setColorDataByIndex(i, InvHist_r[r], InvHist_g[g], InvHist_b[b]);
     }
 }
+
+void Processing::spesifikasiHistogram(Image &image, Histogram &spec)
+{
+    float sum;
+    int minj, minval, HistEq[256], SpecEq[256], InvHist[256];
+    Histogram newHist(image, true);
+    for (int i = 0; i < 256; i++)
+    {
+        sum = 0.0;
+        for (int j = 0; j <= i; j++)
+        {
+            sum += newHist.hist[j];
+        }
+        HistEq[i] = floor(255 * sum);
+    }
+
+    // perataan histogram untuk citra spec
+    for (int i = 0; i < 256; i++)
+    {
+        sum = 0.0;
+        for (int j = 0; j <= i; j++)
+        {
+            sum += spec.hist[j];
+        }
+        SpecEq[i] = floor(255 * sum);
+    }
+
+    // melakukan tranformasi balikan
+    for (int i = 0; i < image.width; i++)
+    {
+        minval = abs(HistEq[i] - SpecEq[0]);
+        minj = 0;
+        for (int j = 0; j < 256; j++)
+        {
+            if (abs(HistEq[i] - SpecEq[j]) < minval)
+            {
+                minval = abs(HistEq[i] - SpecEq[j]);
+                minj = j;
+            }
+        }
+        InvHist[i] = minj;
+    }
+
+    // update citra setelah pembentukan histogram
+    for (int i = 0; i < image.size; i++)
+    {
+        image.setGreyDataByIndex(i, InvHist[image.greyData[i]]);
+    }
+}
+
 // end of Spesifikasi Histogram
 
 // hitungMedian
