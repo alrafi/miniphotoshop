@@ -1,5 +1,6 @@
 #include "Processing.hpp"
 #include "Histogram.hpp"
+#include "HistogramColor.hpp"
 #include <iostream>
 #include <cmath>
 #include <bits/stdc++.h>
@@ -9,75 +10,115 @@ using namespace std;
 // Perataan Histogram
 void Processing::perataanHistogram(Image &image)
 {
-    float sum;
-    int HistEq[256];
-    Histogram newHist(image, true);
-    for (int i = 0; i < 256; i++)
+    float sum_r = 0;
+    float sum_g = 0;
+    float sum_b = 0;
+    int HistEq_r[256];
+    int HistEq_g[256];
+    int HistEq_b[256];
+    // cout << "oke" << endl;
+    if (image.isColor)
     {
-        sum = 0.0;
-        for (int j = 0; j <= i; j++)
+        HistogramColor colorHist(image, true);
+        for (int i = 0; i < 256; i++)
         {
-            sum += newHist.hist[j];
+            sum_r = sum_g = sum_b = 0.0;
+            for (int j = 0; j <= i; j++)
+            {
+                sum_r += colorHist.r->hist[j];
+                sum_g += colorHist.g->hist[j];
+                sum_b += colorHist.b->hist[j];
+            }
+            HistEq_r[i] = floor(255 * sum_r);
+            HistEq_g[i] = floor(255 * sum_g);
+            HistEq_b[i] = floor(255 * sum_b);
         }
-        HistEq[i] = floor(255 * sum);
+        for (int i = 0; i < image.size; i++)
+        {
+            unsigned char r = image.getColorDataByIndex(i).R;
+            unsigned char g = image.getColorDataByIndex(i).G;
+            unsigned char b = image.getColorDataByIndex(i).B;
+            image.setColorDataByIndex(i, HistEq_r[r], HistEq_g[g], HistEq_b[b]);
+        }
     }
-    cout << "oke" << endl;
-    for (int i = 0; i < image.size; i++)
+    else
     {
-        image.setGreyDataByIndex(i, HistEq[image.greyData[i]]);
-        // cout << "size-" << i << endl;
+        float sum;
+        int HistEq[256];
+        Histogram newHist(image, true);
+        for (int i = 0; i < 256; i++)
+        {
+            sum = 0.0;
+            for (int j = 0; j <= i; j++)
+            {
+                sum += newHist.hist[j];
+            }
+            HistEq[i] = floor(255 * sum);
+        }
+        for (int i = 0; i < image.size; i++)
+        {
+            image.setGreyDataByIndex(i, HistEq[image.greyData[i]]);
+        }
     }
-    cout << "siap" << endl;
 }
 // end of Perataan Histogram
 
 // Spesifikasi histogram
 void Processing::spesifikasiHistogram(Image &image, Histogram &spec)
 {
-    float sum;
-    int minj, minval, HistEq[256], SpecEq[256], InvHist[256];
-    Histogram newHist(image, true);
-    for (int i = 0; i < 256; i++)
+    if (image.isColor)
     {
-        sum = 0.0;
-        for (int j = 0; j <= i; j++)
-        {
-            sum += newHist.hist[j];
-        }
-        HistEq[i] = floor(255 * sum);
+        float sum;
+        int minj, minval, HistEq[256], SpecEq[256], InvHist[256];
     }
-
-    // perataan histogram untuk citra spec
-    for (int i = 0; i < 256; i++)
+    else
     {
-        sum = 0.0;
-        for (int j = 0; j <= i; j++)
-        {
-            sum += spec.hist[j];
-        }
-        SpecEq[i] = floor(255 * sum);
-    }
 
-    // melakukan tranformasi balikan
-    for (int i = 0; i < image.width; i++)
-    {
-        minval = abs(HistEq[i] - SpecEq[0]);
-        minj = 0;
-        for (int j = 0; j < 256; j++)
+        float sum;
+        int minj, minval, HistEq[256], SpecEq[256], InvHist[256];
+        Histogram newHist(image, true);
+        for (int i = 0; i < 256; i++)
         {
-            if (abs(HistEq[i] - SpecEq[j]) < minval)
+            sum = 0.0;
+            for (int j = 0; j <= i; j++)
             {
-                minval = abs(HistEq[i] - SpecEq[j]);
-                minj = j;
+                sum += newHist.hist[j];
             }
+            HistEq[i] = floor(255 * sum);
         }
-        InvHist[i] = minj;
-    }
 
-    // update citra setelah pembentukan histogram
-    for (int i = 0; i < image.size; i++)
-    {
-        image.setGreyDataByIndex(i, InvHist[image.greyData[i]]);
+        // perataan histogram untuk citra spec
+        for (int i = 0; i < 256; i++)
+        {
+            sum = 0.0;
+            for (int j = 0; j <= i; j++)
+            {
+                sum += spec.hist[j];
+            }
+            SpecEq[i] = floor(255 * sum);
+        }
+
+        // melakukan tranformasi balikan
+        for (int i = 0; i < image.width; i++)
+        {
+            minval = abs(HistEq[i] - SpecEq[0]);
+            minj = 0;
+            for (int j = 0; j < 256; j++)
+            {
+                if (abs(HistEq[i] - SpecEq[j]) < minval)
+                {
+                    minval = abs(HistEq[i] - SpecEq[j]);
+                    minj = j;
+                }
+            }
+            InvHist[i] = minj;
+        }
+
+        // update citra setelah pembentukan histogram
+        for (int i = 0; i < image.size; i++)
+        {
+            image.setGreyDataByIndex(i, InvHist[image.greyData[i]]);
+        }
     }
 }
 // end of Spesifikasi Histogram
