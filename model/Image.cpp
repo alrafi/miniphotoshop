@@ -462,16 +462,20 @@ void Image::transformasiLogInv(float scalar)
     {
         if (this->isColor)
         {
-            double r = exp(1 + this->colorData[i].R) * scalar;
-            double g = exp(1 + this->colorData[i].G) * scalar;
-            double b = exp(1 + this->colorData[i].B) * scalar;
+            double r = pow(exp(this->colorData[i].R), 1/scalar) - 1;
+            double g = pow(exp(this->colorData[i].G), 1/scalar) - 1;
+            double b = pow(exp(this->colorData[i].B), 1/scalar) - 1;
+            r = r < 0 ? 0 : r;
+            g = g < 0 ? 0 : g;
+            b = b < 0 ? 0 : b;
             this->colorData[i].R = r > 255 ? 255 : r;
             this->colorData[i].G = g > 255 ? 255 : g;
             this->colorData[i].B = b > 255 ? 255 : b;
         }
         else
         {
-            double s = exp(1 + this->greyData[i]) * scalar;
+            double s = pow(exp(this->greyData[i]), 1/scalar) - 1;
+            s = s < 0 ? 0 : s;
             this->greyData[i] = s > 255 ? 255 : s;
         }
     }
