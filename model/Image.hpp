@@ -101,7 +101,7 @@ public:
     void colorToGrayscale();
 
     // method tresholding
-    void tresholding(int T);
+    // void tresholding(int T);
 
     // method gray level slicing
     void grayLevelSlicing();

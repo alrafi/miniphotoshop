@@ -984,16 +984,54 @@ Image Image ::flipping(int type)
 // translasi
 Image Image::translasi(int x, int y)
 {
-    Image temp;
-    temp.createGreyData();
-    for (int i = 0; i < (this->width) - 1; i++)
+    Image *temp = new Image();
+
+    if (this->isColor)
     {
-        for (int j = 0; j < (this->height) - 1; j++)
+        temp->isColor = true;
+        temp->setWidth(this->width);
+        temp->setHeight(this->height);
+        temp->updateSize();
+        temp->createColorData();
+        for (int i = 0; i < (this->width); i++)
         {
-            temp.setGreyData(i, j, this->getGreyData(i + x, j + y))
+            for (int j = 0; j < (this->height); j++)
+            {
+                if (!(i + x < 0) && !(i + x > this->width))
+                {
+                    if (!(j + y < 0) && !(j + y > this->height))
+                    {
+                        unsigned char r = getColorData(i, j).R;
+                        unsigned char g = getColorData(i, j).G;
+                        unsigned char b = getColorData(i, j).B;
+                        temp->setColorData(i + x, j + y, r, g, b);
+                    }
+                }
+            }
         }
     }
-    return temp;
+    else
+    {
+        temp->isColor = false;
+        temp->setWidth(this->width);
+        temp->setHeight(this->height);
+        temp->updateSize();
+        temp->createGreyData();
+        for (int i = 0; i < (this->width); i++)
+        {
+            for (int j = 0; j < (this->height); j++)
+            {
+                if (!(i + x < 0) && !(i + x > this->width))
+                {
+                    if (!(j + y < 0) && !(j + y > this->height))
+                    {
+                        temp->setGreyData(i + x, j + y, this->getGreyData(i, j));
+                    }
+                }
+            }
+        }
+    }
+    return *temp;
 }
 
 void Image::konvolusi(float *filter, int n)
@@ -1258,7 +1296,7 @@ void Image::canny(int t)
 {
     this->gaussianSmoothing();
     this->sobel();
-    this->tresholding(t);
+    // this->tresholding(t);
 }
 
 void Image::show()
