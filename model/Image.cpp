@@ -1004,6 +1004,27 @@ void Image::canny(int t){
     this->tresholding(t);
 }
 
+void Image::transformFourier(){
+    double tetha, epsilon = 1E-12;
+    double* real = new double[this->size];
+    double* imaginer = new double[this->size];
+    for (int i=0; i<this->size; i++) { 
+        real[i]=0;
+        imaginer[i]=0;
+    }
+    for (int i=0; i<this->size; i++){
+         for (int j=0; j<this->size-1; j++){
+            tetha= i*2*3.14*j/(double)this->size;
+            real[i]=real[i]+(this->greyData[j]*cos(tetha))/(double)this->size;
+            imaginer[i]=imaginer[i]-(this->greyData[j]*sin(tetha))/(double)this->size;
+         }
+    }
+    for (int i=0; i<this->size; i++){
+        double spektrum = sqrt(pow(real[i],2) + pow(imaginer[i],2));
+        this->greyData[i] = spektrum;
+    }
+}
+
 void Image::show() {
     cout << "height: " << this->height << endl;
     cout << "width: " << this->width << endl;

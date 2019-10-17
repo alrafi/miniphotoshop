@@ -61,22 +61,22 @@ void Histogram::show() {
 }
 
 Image Histogram::createImage(int scale) {
-    Image img;
-    img.width = scale * 256;
-    img.height = scale * 256;
-    img.updateSize();
-    img.isColor = false;
-    img.createGreyData();
+    Image* img = new Image;
+    img->width = scale * 256;
+    img->height = scale * 256;
+    img->updateSize();
+    img->isColor = false;
+    img->createGreyData();
     int maks = 0;
     for (int i=0; i < 256; i++) {
         maks = maks < this->hist[i] ? this->hist[i] : maks;
     }
     for (int i=0; i < 256; i++) {
-        for (int k=0; k < this->hist[i]*img.height/maks ; k++){
+        for (int k=0; k < this->hist[i]*img->height/maks; k++){
             for (int j=0; j<scale; j++) {
-                img.setGreyData((i*scale)+j,img.height - k,255);
+                img->setGreyData((i*scale)+j,img->height - k,255);
             }
         }
     }
-    return img;
+    return *img;
 }
