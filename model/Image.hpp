@@ -108,6 +108,8 @@ public:
     // automatic tresholding
     void autoTresholding(int TInit, int delta);
 
+    void thinning();
+
     // method gray level slicing
     void grayLevelSlicing();
 

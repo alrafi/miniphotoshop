@@ -143,6 +143,10 @@ int main(int argc, char** argv){
         case 18:
             image.autoTresholding(stoi(argv[3]),stoi(argv[4]));
             break;
+        case 19:
+            image.canny(stoi(argv[3]));
+            image.thinning();
+            break;
         default:
             break;
         }
