@@ -777,6 +777,50 @@ void Image::tresholding(int t)
     }
 }
 
+void Image::tresholding(int T1, int T2)
+{
+    for (int i = 0; i < this->size; i++)
+    {
+        if (this->isColor)
+        {
+            this->colorData[i].R = this->colorData[i].R >= T1 && this->colorData[i].R <= T2 ? 255 : 0;
+            this->colorData[i].G = this->colorData[i].G >= T1 && this->colorData[i].G <= T2 ? 255 : 0;
+            this->colorData[i].B = this->colorData[i].B >= T1 && this->colorData[i].B <= T2 ? 255 : 0;
+        }
+        else
+        {
+            this->greyData[i] = this->greyData[i] >= T1 && this->greyData[i] <= T2 ? 255 : 0;
+        }
+    }
+}
+
+void Image::autoTresholding(int TInit, int delta)
+{
+    // auto treshold
+    int currentT = 9999;
+    int newT=TInit;
+    long sum1,sum2;
+    int count1,count2;
+    while(abs(currentT - newT) > delta){
+        currentT = newT;
+        sum1=0;sum2=0;count1=0;count2=0;
+        for (int i=0; i<this->size; i++){
+            if (this->greyData[i] >= currentT){
+                sum2 += this->greyData[i];
+                count2++;
+            }else {
+                sum1 += this->greyData[i];
+                count1++;
+            }
+        }
+        count1 = count1>0 ? count1 : 1;
+        count2 = count2>0 ? count2 : 1;
+        newT = round((sum1/count1 + sum2/count2) / 2);
+    }
+    cout << "treshold: " << newT << endl;
+    this->tresholding(newT);
+}
+
 Image Image ::operator|(Image image)
 {
     Image newImage;

@@ -69,14 +69,16 @@ int main(int argc, char** argv){
     if (argc < 2) {
         cout << "error" << endl;
     } else {
-        PGM pgm(argv[1]);
-        // BMP bmp2(argv[1]);
+        // PGM pgm(argv[1]);
+        BMP bmp(argv[1]);
+        BMP bmp2(argv[1]);
         Image image;
-        pgm.readFile(image);
+        // pgm.readFile(image);
+        bmp.readFile(image);
         // bmp.readFile(image2);
         int c = stoi(argv[2]);
         
-        Spektrum fourier(image);
+        // Spektrum fourier(image);
         // HistogramColor hist(image);
         switch (c)
         {
@@ -128,13 +130,19 @@ int main(int argc, char** argv){
             // image = hist.b->createImage();
             // hist.b->show();
             break;
-        case 15:
-            fourier.show();
-            image = fourier.getSpektrum();
+        // case 15:
+        // //     fourier.show();
+        // //     image = fourier.getSpektrum();
+        // //     break;
+        // // case 16:
+        // //     fourier.show();
+        // //     image = fourier.balikan();
+        case 17:
+            image.tresholding(stoi(argv[3]),stoi(argv[4]));
             break;
-        case 16:
-            fourier.show();
-            image = fourier.balikan();
+        case 18:
+            image.autoTresholding(stoi(argv[3]),stoi(argv[4]));
+            break;
         default:
             break;
         }

@@ -101,7 +101,12 @@ public:
     void colorToGrayscale();
 
     // method tresholding
+    // standard
     void tresholding(int T);
+    // object in range T1, T2
+    void tresholding(int T1, int T2);
+    // automatic tresholding
+    void autoTresholding(int TInit, int delta);
 
     // method gray level slicing
     void grayLevelSlicing();
