@@ -1494,7 +1494,7 @@ void Image::canny(int t)
 }
 
 void Image::transformFourier(){
-    double tetha, epsilon = 1E-12;
+    double tetha;
     double* real = new double[this->size];
     double* imaginer = new double[this->size];
     for (int i=0; i<this->size; i++) { 
@@ -1510,7 +1510,7 @@ void Image::transformFourier(){
     }
     for (int i=0; i<this->size; i++){
         double spektrum = sqrt(pow(real[i],2) + pow(imaginer[i],2));
-        this->greyData[i] = spektrum;
+        this->greyData[i] = (unsigned char) spektrum;
     }
 }
 
@@ -1519,4 +1519,14 @@ void Image::show() {
     cout << "width: " << this->width << endl;
     cout << "size: " << this->size << endl;
     cout << "isColor: " << this->isColor << endl;
+    cout << "data: " << endl;
+    if (this->isColor){
+        for (int i=0; i<10; i++){
+            cout << "(" << (int)this->colorData[i].R << "," << (int)this->colorData[i].G << "," << (int)this->colorData[i].B << ")" <<endl;
+        }
+    }else {
+        for (int i=0; i<10; i++){
+            cout << (unsigned int)this->greyData[i] << endl;
+        }
+    }
 }

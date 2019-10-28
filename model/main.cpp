@@ -1,8 +1,11 @@
 #include "BMP.hpp"
+#include "PGM.hpp"
 #include <iostream>
 #include "Histogram.hpp"
 #include "HistogramColor.hpp"
 #include "Image.hpp"
+#include "Processing.hpp"
+#include "Spektrum.hpp"
 #include <SDL.h>
 
 using namespace std;
@@ -66,13 +69,15 @@ int main(int argc, char** argv){
     if (argc < 2) {
         cout << "error" << endl;
     } else {
-        BMP bmp(argv[1]);
-        BMP bmp2(argv[1]);
+        PGM pgm(argv[1]);
+        // BMP bmp2(argv[1]);
         Image image;
-        bmp.readFile(image);
-        cout << "drawing" << endl;
+        pgm.readFile(image);
+        // bmp.readFile(image2);
         int c = stoi(argv[2]);
-        HistogramColor hist(image);
+        
+        Spektrum fourier(image);
+        // HistogramColor hist(image);
         switch (c)
         {
         case 0:
@@ -120,13 +125,22 @@ int main(int argc, char** argv){
             image.transformFourier();
             break;
         case 14:
-            image = hist.r->createImage();
+            // image = hist.b->createImage();
+            // hist.b->show();
             break;
+        case 15:
+            fourier.show();
+            image = fourier.getSpektrum();
+            break;
+        case 16:
+            fourier.show();
+            image = fourier.balikan();
         default:
             break;
         }
+        cout << "drawing" << endl;
+        image.show();
         drawImage(image);
-        bmp.writeFile(image, "tes");
     }
 
     return 0;

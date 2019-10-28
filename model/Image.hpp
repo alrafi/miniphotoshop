@@ -68,7 +68,7 @@ public:
     Image operator+(int scalar);
     Image operator-(Image const &img);
     Image operator-(int scalar);
-    Image &operator=(const Image &img);
+    Image&operator=(const Image &img);
     Image operator*(const Image &img);
     Image operator*(int scalar);
     Image operator*(float scalar);
