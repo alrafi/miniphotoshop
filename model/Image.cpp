@@ -826,16 +826,17 @@ void Image::thinning(){
     int trans;
     int temp[9];
     bool change = true;
-    while (change){
+    while(change){
+        cout << "iter" << endl;
         change = false;
         for(int i=1; i<this->height-1; i++){
             for (int j=1; j<this->width-1; j++){
-                if (this->getGreyData(j,i) == 255){
+                if (this->getGreyData(j,i) != 0){
                     count=0;
                     // check count
                     for(int k=-1; k<=1; k++){
                         for (int l=-1; l<=1; l++){
-                            count = this->getGreyData(j+l,i+k)==255 ? count+1 : count;
+                            if (this->getGreyData(j+l,i+k)!=0) count++;
                         }
                     }
                     if (count>2 && count<8){
@@ -850,7 +851,7 @@ void Image::thinning(){
                         temp[8] = this->getGreyData(j-1,i-1);
                         trans = 0;
                         for (int m=0; m<8; m++){
-                            if (temp[m]==0 && temp[m+1]==1) trans++; 
+                            if (temp[m]==0 && temp[m+1]!=0) trans++; 
                         }
                         if (trans==1){
                             this->setGreyData(j,i,0);

@@ -148,6 +148,11 @@ int main(int argc, char** argv){
             image.canny(stoi(argv[3]));
             image.thinning();
             break;
+        case 20:
+            image.loG();
+            image.tresholding(stod(argv[3]));
+            image.thinning();
+            break;
         default:
             break;
         }
