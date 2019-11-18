@@ -827,7 +827,6 @@ void Image::thinning(){
     int temp[9];
     bool change = true;
     while(change){
-        cout << "iter" << endl;
         change = false;
         for(int i=1; i<this->height-1; i++){
             for (int j=1; j<this->width-1; j++){
@@ -1319,7 +1318,7 @@ void Image::konvolusi(float *filter, int n)
 {
     int tempHeight = this->height - n + 1;
     int tempWidth = this->width - n + 1;
-    unsigned int *temp;
+    unsigned char *temp;
     Color *tempC;
     if (this->isColor)
     {
@@ -1327,7 +1326,7 @@ void Image::konvolusi(float *filter, int n)
     }
     else
     {
-        temp = new unsigned int[tempHeight * tempWidth];
+        temp = new unsigned char[tempHeight * tempWidth];
     }
     for (int i = 0; i < tempHeight; i++)
     {
@@ -1356,16 +1355,16 @@ void Image::konvolusi(float *filter, int n)
             if (this->isColor)
             {
                 sumR = sumR < 0 ? 0 : sumR;
-                tempC[i * tempHeight + j].R = sumR > 255 ? 255 : sumR;
+                tempC[i * tempWidth + j].R = sumR > 255 ? 255 : sumR;
                 sumG = sumG < 0 ? 0 : sumG;
-                tempC[i * tempHeight + j].G = sumG > 255 ? 255 : sumG;
+                tempC[i * tempWidth + j].G = sumG > 255 ? 255 : sumG;
                 sumB = sumB < 0 ? 0 : sumB;
-                tempC[i * tempHeight + j].B = sumB > 255 ? 255 : sumB;
+                tempC[i * tempWidth + j].B = sumB > 255 ? 255 : sumB;
             }
             else
             {
                 sum = sum < 0 ? 0 : sum;
-                temp[i * tempHeight + j] = sum > 255 ? 255 : sum;
+                temp[i * tempWidth + j] = sum > 255 ? 255 : sum;
             }
         }
     }
@@ -1376,11 +1375,11 @@ void Image::konvolusi(float *filter, int n)
         {
             if (this->isColor)
             {
-                this->setColorData(j + offset, i + offset, tempC[i * tempHeight + j].R, tempC[i * tempHeight + j].G, tempC[i * tempHeight + j].B);
+                this->setColorData(j + offset, i + offset, tempC[i * tempWidth + j].R, tempC[i * tempWidth + j].G, tempC[i * tempWidth + j].B);
             }
             else
             {
-                this->setGreyData(j + offset, i + offset, temp[i * tempHeight + j]);
+                this->setGreyData(j + offset, i + offset, temp[i * tempWidth + j]);
             }
         }
     }
@@ -1440,16 +1439,16 @@ void Image::konvolusi(float *filterX, float *filterY, int n)
             if (this->isColor)
             {
                 int sumR = abs(sumXR) + abs(sumYR);
-                tempC[i * tempHeight + j].R = sumR > 255 ? 255 : sumR;
+                tempC[i * tempWidth + j].R = sumR > 255 ? 255 : sumR;
                 int sumG = abs(sumXG) + abs(sumYG);
-                tempC[i * tempHeight + j].G = sumG > 255 ? 255 : sumG;
+                tempC[i * tempWidth + j].G = sumG > 255 ? 255 : sumG;
                 int sumB = abs(sumXB) + abs(sumYB);
-                tempC[i * tempHeight + j].B = sumB > 255 ? 255 : sumB;
+                tempC[i * tempWidth + j].B = sumB > 255 ? 255 : sumB;
             }
             else
             {
                 int sum = abs(sumX) + abs(sumY);
-                temp[i * tempHeight + j] = sum > 255 ? 255 : sum;
+                temp[i * tempWidth + j] = sum > 255 ? 255 : sum;
             }
         }
     }
@@ -1460,11 +1459,11 @@ void Image::konvolusi(float *filterX, float *filterY, int n)
         {
             if (this->isColor)
             {
-                this->setColorData(j + offset, i + offset, tempC[i * tempHeight + j].R, tempC[i * tempHeight + j].G, tempC[i * tempHeight + j].B);
+                this->setColorData(j + offset, i + offset, tempC[i * tempWidth + j].R, tempC[i * tempWidth + j].G, tempC[i * tempWidth + j].B);
             }
             else
             {
-                this->setGreyData(j + offset, i + offset, temp[i * tempHeight + j]);
+                this->setGreyData(j + offset, i + offset, temp[i * tempWidth + j]);
             }
         }
     }

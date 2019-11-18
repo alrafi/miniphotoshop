@@ -145,14 +145,19 @@ int main(int argc, char** argv){
             image.autoTresholding(stoi(argv[3]),stoi(argv[4]));
             break;
         case 19:
+            if(image.isColor){
+                image.colorToGrayscale();
+            }
             image.canny(stoi(argv[3]));
             image.thinning();
             break;
         case 20:
-            image.loG();
-            image.tresholding(stod(argv[3]));
+            // metode 1
+            image.colorToGrayscale();
+            image.gaussianSmoothing();
+            image.autoTresholding(100, 10);
+            image.canny(100);
             image.thinning();
-            break;
         default:
             break;
         }
