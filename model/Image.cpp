@@ -825,31 +825,38 @@ void Image::thinning(){
     int count;
     int trans;
     int temp[9];
-    for(int i=1; i<this->height-1; i++){
-        for (int j=1; j<this->width-1; j++){
-            if (this->getGreyData(j,i) == 255){
-                count=0;
-                // check count
-                for(int k=-1; k<=1; k++){
-                    for (int l=-1; l<=1; l++){
-                        count = this->getGreyData(j+l,i+k)==255 ? count+1 : count;
+    bool change = true;
+    while (change){
+        change = false;
+        for(int i=1; i<this->height-1; i++){
+            for (int j=1; j<this->width-1; j++){
+                if (this->getGreyData(j,i) == 255){
+                    count=0;
+                    // check count
+                    for(int k=-1; k<=1; k++){
+                        for (int l=-1; l<=1; l++){
+                            count = this->getGreyData(j+l,i+k)==255 ? count+1 : count;
+                        }
                     }
-                }
-                if (count>2 && count<8){
-                    temp[0] = this->getGreyData(j-1,i-1);
-                    temp[1] = this->getGreyData(j,i-1);
-                    temp[2] = this->getGreyData(j+1,i-1);
-                    temp[3] = this->getGreyData(j+1,i);
-                    temp[4] = this->getGreyData(j+1,i+1);
-                    temp[5] = this->getGreyData(j,i+1);
-                    temp[6] = this->getGreyData(j-1,i+1);
-                    temp[7] = this->getGreyData(j-1,i);
-                    temp[8] = this->getGreyData(j-1,i-1);
-                    trans = 0;
-                    for (int m=0; m<8; m++){
-                        if (temp[m]==0 && temp[m+1]==1) trans++; 
+                    if (count>2 && count<8){
+                        temp[0] = this->getGreyData(j-1,i-1);
+                        temp[1] = this->getGreyData(j,i-1);
+                        temp[2] = this->getGreyData(j+1,i-1);
+                        temp[3] = this->getGreyData(j+1,i);
+                        temp[4] = this->getGreyData(j+1,i+1);
+                        temp[5] = this->getGreyData(j,i+1);
+                        temp[6] = this->getGreyData(j-1,i+1);
+                        temp[7] = this->getGreyData(j-1,i);
+                        temp[8] = this->getGreyData(j-1,i-1);
+                        trans = 0;
+                        for (int m=0; m<8; m++){
+                            if (temp[m]==0 && temp[m+1]==1) trans++; 
+                        }
+                        if (trans==1){
+                            this->setGreyData(j,i,0);
+                            change = true;
+                        }
                     }
-                    if (trans==1) this->setGreyData(j,i,0);
                 }
             }
         }

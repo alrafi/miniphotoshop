@@ -1,4 +1,5 @@
 #include "BMP.hpp"
+#include "PPM.hpp"
 #include "PGM.hpp"
 #include <iostream>
 #include "Histogram.hpp"
@@ -71,7 +72,7 @@ int main(int argc, char** argv){
     } else {
         // PGM pgm(argv[1]);
         BMP bmp(argv[1]);
-        BMP bmp2(argv[1]);
+        // BMP bmp2(argv[1]);
         Image image;
         // pgm.readFile(image);
         bmp.readFile(image);

@@ -72,25 +72,42 @@ void BMP :: readFile(Image& thisImage){
     }
     
     // read image data
+    int sum = 0;
     imagefile.seekg(this->header.offset, imagefile.beg);
-    for (int i = 0; i < this->infoHeader.height; i++) {
-        for (int j = 0; j < this->infoHeader.width; j++) {
-            if (this->infoHeader.nColours) {
-                imagefile.read((char *) &c, 1);
-                int index = c;
-                thisImage.setColorData(j,i,palette[index].R, palette[index].G, palette[index].B);
-            } else if (this->infoHeader.bits == 24) {
-                unsigned char r,g,b;
-                imagefile.read((char *)&b, 1);
-                imagefile.read((char *)&g, 1);
-                imagefile.read((char *)&r, 1);
-                thisImage.setColorData(j,i,r,g,b);
-            } else {
-                imagefile.read ((char *) &c, 1);
-                thisImage.setGreyData(j,i,c);
-            }
+    if(this->infoHeader.bits == 24){
+        unsigned char* dataColor = new unsigned char[3 * thisImage.size];
+        imagefile.read((char *) dataColor, 3 * thisImage.size);
+        for (int i=0; i < thisImage.size; i++){
+            thisImage.setColorDataByIndex(i, dataColor[3*i + 2], dataColor[3*i + 1], dataColor[3*i]);
+        }
+    }else{
+        unsigned char* dataGray = new unsigned char[thisImage.size];
+        imagefile.read((char *) dataGray, thisImage.size);
+        for (int i=0; i < thisImage.size; i++){
+            thisImage.setGreyDataByIndex(i, dataGray[i]);
         }
     }
+    // for (int i = 0; i < this->infoHeader.height; i++) {
+    //     for (int j = 0; j < this->infoHeader.width; j++) {
+    //         if (this->infoHeader.nColours) {
+    //             imagefile.read((char *) &c, 1);
+    //             int index = c;
+    //             thisImage.setColorData(j,i,palette[index].R, palette[index].G, palette[index].B);
+    //         } else if (this->infoHeader.bits == 24) {
+    //             unsigned char r,g,b;
+    //             imagefile.read((char *)&b, 1);
+    //             sum ++;
+    //             imagefile.read((char *)&g, 1);
+    //             sum ++;
+    //             imagefile.read((char *)&r, 1);
+    //             sum ++;
+    //             thisImage.setColorData(j,i,r,g,b);
+    //         } else {
+    //             imagefile.read ((char *) &c, 1);
+    //             thisImage.setGreyData(j,i,c);
+    //         }
+    //     }
+    // }
     cout << "data" << endl;
     if (thisImage.isColor) {
         for (int i=0; i < 20; i++) {
