@@ -78,6 +78,7 @@ int main(int argc, char** argv){
         bmp.readFile(image);
         // bmp.readFile(image2);
         int c = stoi(argv[2]);
+        int* tes;
         
         // Spektrum fourier(image);
         // HistogramColor hist(image);
@@ -156,8 +157,10 @@ int main(int argc, char** argv){
             image.colorToGrayscale();
             image.gaussianSmoothing();
             image.autoTresholding(100, 10);
-            image.canny(100);
-            image.thinning();
+            // image.canny(100);
+            // image.thinning();
+            image.dilation(5);
+            tes = image.CCL();
         default:
             break;
         }

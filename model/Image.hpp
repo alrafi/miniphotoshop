@@ -109,6 +109,8 @@ public:
     void autoTresholding(int TInit, int delta);
 
     void thinning();
+    void dilation(int loop=1);
+    int* CCL();
 
     // method gray level slicing
     void grayLevelSlicing();

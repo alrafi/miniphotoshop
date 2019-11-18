@@ -863,6 +863,47 @@ void Image::thinning(){
     }
 }
 
+
+void Image::dilation(int loop){
+    float filter[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i=0; i<loop; i++){
+        this->konvolusi(filter, 3);
+    }
+}
+
+
+int* Image::CCL(){
+    int label = 1;
+    int* result = new int[this->size];
+    int temp[4];
+    for(int i=0; i < this->height; i++){
+        for (int j=0; j < this->width; j++){
+            result[i*this->width +j]=0;
+            if (this->getGreyData(j,i) != 0){
+                temp[0] = (i!=0 && j!=0) ? result[(i-1)*this->width + j-1] : 0;
+                temp[1] = (i!=0) ? result[(i-1)*this->width + j] : 0;
+                temp[2] = (i!=0 && j!=this->width) ? result[(i-1)*this->width + j+1] : 0;
+                temp[3] = (j!=0) ? result [i*this->width + j-1] : 0;
+                for (int k=0; k<4; k++){
+                    if (temp[k]!=0){
+                        if (result[i*this->width + j] == 0){
+                            result[i*this->width + j] = temp[k];
+                        } else if (temp[k] != result[i*this->width + j]){
+                            // simpan equivalence
+                        }
+                    }
+                }
+                if (result[i*this->width + j] == 0){
+                    result[i*this->width + j] = label;
+                    label++;
+                }
+            }
+        }
+    }
+    cout << "label: " << label << endl;
+    return result; 
+}
+
 Image Image ::operator|(Image image)
 {
     Image newImage;
@@ -1616,3 +1657,4 @@ void Image::show() {
         }
     }
 }
+
