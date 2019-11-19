@@ -5,6 +5,7 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "ios": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "string": "cpp"
     }
 }

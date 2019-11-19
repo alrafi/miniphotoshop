@@ -75,6 +75,7 @@ int main(int argc, char** argv){
         // BMP bmp2(argv[1]);
         // PPM ppm(argv[1]);
         Image image;
+        Image mask;
         // pgm.readFile(image);
         bmp.readFile(image);
         // bmp.readFile(image2);
@@ -156,15 +157,45 @@ int main(int argc, char** argv){
         case 20:
             // metode 1
             image.colorToGrayscale();
-            image.citraNegativeGrayscale();
+            mask = image;
+            mask.citraNegativeGrayscale();
             // image.gaussianSmoothing();
             // image.autoTresholding(100, 10);
-            image.tresholding(220);
+            mask.tresholding(220);
             // image.canny(100);
             // image.thinning();
-            image.dilation(2);
-            // image.penapisRatio(stof(argv[3]), stof(argv[4]));
-            image.penapisArea(stoi(argv[3]), stoi(argv[4]));
+            mask.dilation(2);
+            mask.penapisRatio(stof(argv[3]), stof(argv[4]));
+            // image.penapisArea(stoi(argv[3]), stoi(argv[4]));
+            image.crop(mask);
+            image.tresholding(stoi(argv[5]));
+            image.thinning();
+            image.resizePixels(160, 80);
+            image.penapisArea(0.01 * image.size, image.size);
+
+            cout << "flag" << endl;
+            image = image.smearing(stoi(argv[6]));
+            cout << "flag" << endl;
+            // image.resizePixels(200, 69);
+            break;
+        case 21:
+            // metode 1
+            image.colorToGrayscale();
+            mask = image;
+            mask.citraNegativeGrayscale();
+            // image.gaussianSmoothing();
+            // image.autoTresholding(100, 10);
+            mask.tresholding(220);
+            // image.canny(100);
+            // image.thinning();
+            mask.dilation(2);
+            mask.penapisRatio(stof(argv[3]), stof(argv[4]));
+            // image.penapisArea(stoi(argv[3]), stoi(argv[4]));
+            image.crop(mask);
+            image.tresholding(stoi(argv[5]));
+            image.thinning();
+            image.resizePixels(160, 80);
+            image.penapisArea(0.01 * image.size, image.size);
         default:
             break;
         }

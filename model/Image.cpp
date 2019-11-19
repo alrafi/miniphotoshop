@@ -974,7 +974,7 @@ void Image::penapisRatio(float r1, float r2){
     }
     for (int i=0; i < this->height; i++){
         for (int j=0; j < this->width; j++){
-            if (result[i] != 0){
+            if (result[i*this->width + j] != 0){
                 // top
                 if (blob[result[i*this->width + j] * 4] > i){
                     blob[result[i*this->width + j] * 4] = i;
@@ -1001,14 +1001,12 @@ void Image::penapisRatio(float r1, float r2){
     for (int i=0; i<sum;i++){
         removed[i] = true;
     }
-    cout << "rat:" << endl;
     for (int i=0; i<sum;i++){
         float top = (float) blob[i*4];
         float bottom = (float) blob[i*4 + 1];
         float left = (float) blob[i*4 + 2];
         float right = (float) blob[i*4 + 3];
         float r = top!=bottom && right!=left ? (right-left)/(bottom-top) : 0;
-        cout << r << endl;
         if (r >= r1 && r <= r2){
             removed[i] = false;
         }
@@ -1033,15 +1031,143 @@ void Image::penapisArea(int a1, int a2){
     for (int i=0; i<this->size; i++){
         counter[result[i]]++;
     }
-    cout << "counter: " << endl;
-    for (int i=0; i<sum; i++){
-        cout << counter[i] << endl;
-    }
     for (int i=0; i<this->size; i++){
         if(counter[result[i]] <= a1 || counter[result[i]]>=a2){
             this->setGreyDataByIndex(i, 0);
         }
     }
+}
+
+
+void Image::crop(const Image& mask){
+    int top=mask.height;
+    int bottom=0;
+    int left=mask.width;
+    int right=0;
+    for(int i=0; i<this->height; i++){
+        for(int j=0; j<this->width; j++){
+            if (mask.greyData[i*this->width + j] !=0){
+                if (top>i) top = i;
+                if (bottom<i) bottom = i;
+                if (left>j) left = j;
+                if (right<j) right = j;
+            }
+        }
+    }
+    Image img1,img2;
+    img1 = *this & mask;
+    img2.width = right - left - 1;
+    img2.height = bottom - top - 1;
+    img2.isColor = false;
+    img2.updateSize();
+    img2.createGreyData();
+    for (int i=0; i<img2.height; i++){
+        for (int j=0; j<img2.width; j++){
+            img2.setGreyData(j, i, img1.getGreyData(j+left, i+top));
+        }
+    }
+    *this = img2;
+}
+
+void Image::resizePixels(int w2, int h2){
+    Image temp;
+    temp.setHeight(h2);
+    temp.setWidth(w2);
+    temp.updateSize();
+    temp.isColor = this->isColor;
+    if (temp.isColor){
+        temp.createColorData();
+    }else{
+        temp.createGreyData();
+    }
+    int w1 = this->width;
+    int h1 = this->height;
+    int x_ratio = (int)((w1<<16)/w2) +1;
+    int y_ratio = (int)((h1<<16)/h2) +1;
+    int x2, y2 ;
+    if(!temp.isColor){
+        for (int i=0;i<h2;i++) {
+            for (int j=0;j<w2;j++) {
+                x2 = ((j*x_ratio)>>16) ;
+                y2 = ((i*y_ratio)>>16) ;
+                temp.greyData[(i*w2)+j] = this->greyData[(y2*w1)+x2] ;
+            }                
+        }     
+    }else{
+        for (int i=0;i<h2;i++) {
+            for (int j=0;j<w2;j++) {
+                x2 = ((j*x_ratio)>>16) ;
+                y2 = ((i*y_ratio)>>16) ;
+                temp.colorData[(i*w2)+j] = this->colorData[(y2*w1)+x2] ;
+            }                
+        }
+    }
+    *this = temp;
+}
+
+Image* Image :: ekstraksi(Image smearing){
+    Image* list_char = new Image[9];
+    bool gali = false;
+    int j1, j2 =0;
+    int index = 0;
+    for(int j=0; j<smearing.width; j++){
+        if(smearing.getGreyData(0,j)==255){
+            if(gali==false){
+                j1=j;
+            }
+            gali = true;
+        }else{
+            if(gali==true || j == smearing.width-1){
+                j2=j-1;
+                Image image;
+                image.width = j2-j1+1;
+                image.height = image.height;
+                image.updateSize();
+                image.createGreyData();
+                for(int i=0; i<image.height; i++){
+                    int l = 0;
+                    for(int k=j1; k<=j2; k++){
+                        image.setGreyData(i,l,smearing.getGreyData(i,k));
+                        l++;
+                    }
+                }
+                list_char[index] = image;
+                index++;
+            }
+            gali = false;
+        }
+    }
+    return list_char;
+}
+
+Image Image :: smearing(int treshold){
+    Image* temp =  new Image;
+    temp->width = this->width;
+    temp->height = this->height;
+    temp->isColor = this->isColor;
+    temp->updateSize();
+    temp->createGreyData();
+    cout << "flag1" << endl;
+    for(int j =0; j < this->width; j++){
+        int count = 0;
+        for(int i=0; i < this->height; i++){
+            if( this->getGreyData(j,i) != 0){
+                count++;
+            }
+        }
+        if (count > treshold){
+            for(int i=0; i < this->height; i++){
+                temp->setGreyData(j,i,255);
+            }
+        }else{
+            for(int i=0; i < this->height; i++){
+                temp->setGreyData(j,i,0);
+            }
+        }
+    }
+    
+    cout << "flag2" << endl;
+    return *temp;
 }
 
 Image Image ::operator|(Image image)

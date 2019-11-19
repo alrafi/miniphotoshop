@@ -113,6 +113,10 @@ public:
     void CCL(int **hasil, int *sum);
     void penapisRatio(float r1, float r2);
     void penapisArea(int a1, int a2);
+    void crop(const Image& mask);
+    void resizePixels(int w2, int h2);
+    Image* ekstraksi(Image smearing);
+    Image smearing(int treshold);
 
     // method gray level slicing
     void grayLevelSlicing();
