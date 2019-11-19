@@ -31,16 +31,16 @@ void drawImage(Image& img) {
             renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-            for (int i = 0; i < img.width; i++) {
-                for (int j = 0; j < img.height; j++) {
+            for (int i = 0; i < img.height; i++) {
+                for (int j = 0; j < img.width; j++) {
                     if (img.isColor) {
-                        Color c = img.getColorData(i,j);
+                        Color c = img.getColorData(j,i);
                         SDL_SetRenderDrawColor(renderer, c.R, c.G, c.B, 0);
                     } else {
-                        int g = img.getGreyData(i,j);
+                        int g = img.getGreyData(j,i);
                         SDL_SetRenderDrawColor(renderer, g, g, g, 0);
                     }
-                    SDL_RenderDrawPoint(renderer,j,i);
+                    SDL_RenderDrawPoint(renderer,img.width-1-j,i);
                 }
             }
             SDL_RenderPresent(renderer);
@@ -73,12 +73,13 @@ int main(int argc, char** argv){
         // PGM pgm(argv[1]);
         BMP bmp(argv[1]);
         // BMP bmp2(argv[1]);
+        // PPM ppm(argv[1]);
         Image image;
         // pgm.readFile(image);
         bmp.readFile(image);
         // bmp.readFile(image2);
+        // ppm.readFile(image);
         int c = stoi(argv[2]);
-        int* tes;
         
         // Spektrum fourier(image);
         // HistogramColor hist(image);
@@ -155,12 +156,15 @@ int main(int argc, char** argv){
         case 20:
             // metode 1
             image.colorToGrayscale();
-            image.gaussianSmoothing();
-            image.autoTresholding(100, 10);
+            image.citraNegativeGrayscale();
+            // image.gaussianSmoothing();
+            // image.autoTresholding(100, 10);
+            image.tresholding(220);
             // image.canny(100);
             // image.thinning();
-            image.dilation(5);
-            tes = image.CCL();
+            image.dilation(2);
+            // image.penapisRatio(stof(argv[3]), stof(argv[4]));
+            image.penapisArea(stoi(argv[3]), stoi(argv[4]));
         default:
             break;
         }

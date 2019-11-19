@@ -78,13 +78,13 @@ void BMP :: readFile(Image& thisImage){
         unsigned char* dataColor = new unsigned char[3 * thisImage.size];
         imagefile.read((char *) dataColor, 3 * thisImage.size);
         for (int i=0; i < thisImage.size; i++){
-            thisImage.setColorDataByIndex(i, dataColor[3*i + 2], dataColor[3*i + 1], dataColor[3*i]);
+            thisImage.setColorDataByIndex(thisImage.size-1-i, dataColor[3*i + 2], dataColor[3*i + 1], dataColor[3*i]);
         }
     }else{
         unsigned char* dataGray = new unsigned char[thisImage.size];
         imagefile.read((char *) dataGray, thisImage.size);
         for (int i=0; i < thisImage.size; i++){
-            thisImage.setGreyDataByIndex(i, dataGray[i]);
+            thisImage.setGreyDataByIndex(thisImage.size-1-i, dataGray[i]);
         }
     }
     // for (int i = 0; i < this->infoHeader.height; i++) {

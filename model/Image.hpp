@@ -110,7 +110,9 @@ public:
 
     void thinning();
     void dilation(int loop=1);
-    int* CCL();
+    void CCL(int **hasil, int *sum);
+    void penapisRatio(float r1, float r2);
+    void penapisArea(int a1, int a2);
 
     // method gray level slicing
     void grayLevelSlicing();

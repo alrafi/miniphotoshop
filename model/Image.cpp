@@ -4,6 +4,7 @@
 #include "Histogram.hpp"
 #include <vector>
 #include <cstdlib>
+#include <map>
 
 using namespace std;
 Image ::Image()
@@ -872,10 +873,11 @@ void Image::dilation(int loop){
 }
 
 
-int* Image::CCL(){
+void Image::CCL(int **hasil, int *nRegion){
     int label = 1;
-    int* result = new int[this->size];
+    int *result = new int[this->size];
     int temp[4];
+    map<int, int> equivalence;
     for(int i=0; i < this->height; i++){
         for (int j=0; j < this->width; j++){
             result[i*this->width +j]=0;
@@ -889,7 +891,24 @@ int* Image::CCL(){
                         if (result[i*this->width + j] == 0){
                             result[i*this->width + j] = temp[k];
                         } else if (temp[k] != result[i*this->width + j]){
-                            // simpan equivalence
+                            // add equivalence
+                            int key, val;
+                            if (temp[k] < result[i*this->width + j]){
+                                key = result[i*this->width + j];
+                                result[i*this->width + j] = temp[k];
+                            } else {
+                                key = temp[k];
+                            }
+                            bool isFind = true;
+                            val = result[i*this->width + j];
+                            while(isFind){
+                                isFind = equivalence.find(val) != equivalence.end();
+                                if (!isFind){
+                                    equivalence.insert(pair<int, int>(key, val));
+                                }else{
+                                    val = equivalence[val];
+                                }
+                            }
                         }
                     }
                 }
@@ -900,8 +919,129 @@ int* Image::CCL(){
             }
         }
     }
+    
+    // join region
+    for (int i=0; i<this->size; i++){
+        if(equivalence.find(result[i]) != equivalence.end()){
+            result[i] = equivalence[result[i]];
+        }
+    }
     cout << "label: " << label << endl;
-    return result; 
+
+    // count region
+    int sum = 1;
+    // init check
+    bool* check = new bool[label];
+    check[0] = true;
+    for (int i=1; i<label;i++){
+        check[i] = false;   
+    }
+
+    // map classes
+    map<int,int> classes;
+    for (int i=0; i<this->size; i++){
+        if (!check[result[i]]){
+            classes.insert(pair<int,int>(result[i], sum));
+            check[result[i]] = true;
+            sum++;
+        }
+    }
+    
+    // label to classes
+    for (int i=0; i<this->size; i++){
+        if(classes.find(result[i]) != classes.end()){
+            result[i] = classes[result[i]];
+        }
+    }
+    cout << "sum: " << sum << endl;
+    *hasil = result;
+    *nRegion = sum;
+}
+
+void Image::penapisRatio(float r1, float r2){
+    int* result;
+    int sum;
+    this->CCL(&result, &sum);
+
+    // init blob
+    // [top, bottom, left, right]
+    int* blob = new int[4 * sum];
+    for (int i=0; i < sum; i++){
+        blob[i*4] = this->height;
+        blob[i*4 + 1] = 0;
+        blob[i*4 + 2] = this->width;
+        blob[i*4 + 3] = 0;
+    }
+    for (int i=0; i < this->height; i++){
+        for (int j=0; j < this->width; j++){
+            if (result[i] != 0){
+                // top
+                if (blob[result[i*this->width + j] * 4] > i){
+                    blob[result[i*this->width + j] * 4] = i;
+                }
+                // bottom
+                if (blob[result[i*this->width + j] * 4 + 1] < i){
+                    blob[result[i*this->width + j] * 4 + 1] = i;
+                }
+                // left
+                if (blob[result[i*this->width + j] * 4 + 2] > j){
+                    blob[result[i*this->width + j] * 4 + 2] = j;
+                }
+                // right 
+                if (blob[result[i*this->width + j] * 4 + 3] < j){
+                    blob[result[i*this->width + j] * 4 + 3] = j;
+                }
+            }
+        }
+    }
+
+    // remove region
+    // ratio
+    bool * removed = new bool[sum];
+    for (int i=0; i<sum;i++){
+        removed[i] = true;
+    }
+    cout << "rat:" << endl;
+    for (int i=0; i<sum;i++){
+        float top = (float) blob[i*4];
+        float bottom = (float) blob[i*4 + 1];
+        float left = (float) blob[i*4 + 2];
+        float right = (float) blob[i*4 + 3];
+        float r = top!=bottom && right!=left ? (right-left)/(bottom-top) : 0;
+        cout << r << endl;
+        if (r >= r1 && r <= r2){
+            removed[i] = false;
+        }
+    }
+
+    for (int i=0; i<this->size; i++){
+        if(removed[result[i]]){
+            this->setGreyDataByIndex(i, 0);
+        }
+    }
+}
+
+void Image::penapisArea(int a1, int a2){
+    int* result;
+    int sum;
+    this->CCL(&result, &sum);
+
+    int* counter = new int[sum];
+    for (int i=0; i<sum; i++){
+        counter[i] = 0;
+    }
+    for (int i=0; i<this->size; i++){
+        counter[result[i]]++;
+    }
+    cout << "counter: " << endl;
+    for (int i=0; i<sum; i++){
+        cout << counter[i] << endl;
+    }
+    for (int i=0; i<this->size; i++){
+        if(counter[result[i]] <= a1 || counter[result[i]]>=a2){
+            this->setGreyDataByIndex(i, 0);
+        }
+    }
 }
 
 Image Image ::operator|(Image image)
