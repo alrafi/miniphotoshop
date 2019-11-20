@@ -32,6 +32,26 @@ Image ::Image(int width, int height, bool isColor)
     }
 }
 
+
+Image :: Image(const Image &img){
+    this->width = img.width;
+    this->height = img.height;
+    this->updateSize();
+    this->isColor = img.isColor;
+    this->size = img.size;
+    if (this->isColor)
+        this->createColorData();
+    else
+        this->createGreyData();
+    for (int i = 0; i < this->size; i++)
+    {
+        if (this->isColor)
+            this->colorData[i] = img.colorData[i];
+        else
+            this->greyData[i] = img.greyData[i];
+    }
+}
+
 Image ::~Image()
 {
     if (colorData != NULL)
@@ -1038,7 +1058,6 @@ void Image::penapisArea(int a1, int a2){
     }
 }
 
-
 void Image::crop(const Image& mask){
     int top=mask.height;
     int bottom=0;
@@ -1067,6 +1086,35 @@ void Image::crop(const Image& mask){
         }
     }
     *this = img2;
+}
+
+void Image::crop(){
+    int top=this->height;
+    int bottom=0;
+    int left=this->width;
+    int right=0;
+    for(int i=0; i<this->height; i++){
+        for(int j=0; j<this->width; j++){
+            if (this->greyData[i*this->width + j] !=0){
+                if (top>i) top = i;
+                if (bottom<i) bottom = i;
+                if (left>j) left = j;
+                if (right<j) right = j;
+            }
+        }
+    }
+    Image img;
+    img.width = right - left;
+    img.height = bottom - top;
+    img.isColor = false;
+    img.updateSize();
+    img.createGreyData();
+    for (int i=0; i<img.height; i++){
+        for (int j=0; j<img.width; j++){
+            img.setGreyData(j, i, this->getGreyData(j+left, i+top));
+        }
+    }
+    *this = img;
 }
 
 void Image::resizePixels(int w2, int h2){
@@ -1105,48 +1153,71 @@ void Image::resizePixels(int w2, int h2){
     *this = temp;
 }
 
-Image* Image :: ekstraksi(Image smearing){
+Image* Image :: ekstraksi(Image smearing, int* count){
     Image* list_char = new Image[9];
     bool gali = false;
     int j1, j2 =0;
     int index = 0;
     for(int j=0; j<smearing.width; j++){
-        if(smearing.getGreyData(0,j)==255){
+        if(smearing.getGreyData(j,0)==255){
             if(gali==false){
+                cout << "tes1" << endl;
                 j1=j;
             }
             gali = true;
-        }else{
-            if(gali==true || j == smearing.width-1){
-                j2=j-1;
+            if (j == smearing.width-1) {
+                cout << "tes2" << endl;
+                j2=j;
                 Image image;
                 image.width = j2-j1+1;
-                image.height = image.height;
+                image.height = smearing.height;
                 image.updateSize();
                 image.createGreyData();
                 for(int i=0; i<image.height; i++){
                     int l = 0;
                     for(int k=j1; k<=j2; k++){
-                        image.setGreyData(i,l,smearing.getGreyData(i,k));
+                        image.setGreyData(l,i,this->getGreyData(k,i));
                         l++;
                     }
                 }
+                cout<<"flag4"<<endl;
+                image.show();
+                cout<< j1 << "," << j2 <<endl;
                 list_char[index] = image;
+                index++;
+            }
+        }else{
+            if(gali==true){
+                j2=j-1;
+                Image image;
+                image.width = j2-j1+1;
+                image.height = smearing.height;
+                image.updateSize();
+                image.createGreyData();
+                for(int i=0; i<image.height; i++){
+                    int l = 0;
+                    for(int k=j1; k<=j2; k++){
+                        image.setGreyData(l,i,this->getGreyData(k,i));
+                        l++;
+                    }
+                }
+                cout<<"flag4"<<endl;
+                // image.show();
+                // cout<< j1 << "," << j2 <<endl;
+                list_char[index].addImage(image);
+                cout << index << endl;
                 index++;
             }
             gali = false;
         }
+        // cout << "j:"<< j <<endl;
     }
+    *count = index;
+    cout<<"flag5"<<endl;
     return list_char;
 }
 
-Image Image :: smearing(int treshold){
-    Image* temp =  new Image;
-    temp->width = this->width;
-    temp->height = this->height;
-    temp->isColor = this->isColor;
-    temp->updateSize();
-    temp->createGreyData();
+void Image :: smearing(int treshold){
     cout << "flag1" << endl;
     for(int j =0; j < this->width; j++){
         int count = 0;
@@ -1157,17 +1228,14 @@ Image Image :: smearing(int treshold){
         }
         if (count > treshold){
             for(int i=0; i < this->height; i++){
-                temp->setGreyData(j,i,255);
+                this->setGreyData(j,i,255);
             }
         }else{
             for(int i=0; i < this->height; i++){
-                temp->setGreyData(j,i,0);
+                this->setGreyData(j,i,0);
             }
         }
     }
-    
-    cout << "flag2" << endl;
-    return *temp;
 }
 
 Image Image ::operator|(Image image)
@@ -1924,3 +1992,31 @@ void Image::show() {
     }
 }
 
+void Image::addImage(const Image &img){
+    this->width = img.width;
+    this->height = img.height;
+    this->updateSize();
+    this->isColor = img.isColor;
+    this->size = img.size;
+    if (this->isColor)
+        this->createColorData();
+    else
+        this->createGreyData();
+    for (int i = 0; i < this->size; i++)
+    {
+        if (this->isColor)
+            this->colorData[i] = img.colorData[i];
+        else
+            this->greyData[i] = img.greyData[i];
+    }
+}
+
+int Image::pixelMatching(Image& image) {
+    int count = 0;
+    for (int i=0; i < this->size; i++) {
+        if (this->getGreyDataByIndex(i) == image.getGreyDataByIndex(i)) {
+            count++;
+        }
+    }
+    return count;
+}

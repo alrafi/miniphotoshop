@@ -15,10 +15,12 @@ public:
     //constructor
     Image();
     Image(int width, int height, bool isColor);
+    Image(const Image &img);
 
     //destroyer
     ~Image();
 
+    void addImage(const Image &img);
     //data constructor
     void createColorData();
     void createGreyData();
@@ -114,10 +116,11 @@ public:
     void penapisRatio(float r1, float r2);
     void penapisArea(int a1, int a2);
     void crop(const Image& mask);
+    void crop();
     void resizePixels(int w2, int h2);
-    Image* ekstraksi(Image smearing);
-    Image smearing(int treshold);
-
+    Image* ekstraksi(Image smearing, int *count);
+    void smearing(int treshold);
+    int pixelMatching(Image& image);
     // method gray level slicing
     void grayLevelSlicing();
 
