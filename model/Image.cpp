@@ -2020,3 +2020,77 @@ int Image::pixelMatching(Image& image) {
     }
     return count;
 }
+
+
+void Image::transformHough(int n, int m, int t){
+    // create look up table
+    float *Cos, *Sin;
+    float th, R_TO_D = 0.017453;
+    Cos = new float[m];
+    Sin = new float[m];
+    for (int i=0; i<m; i++){
+        th = ((float) i * 180.0f/(m-1) - 90.0f);
+        th = th * R_TO_D;
+        Cos[i] = cos(th);
+        Sin[i] = sin(th);
+    }
+    // hough transform
+    int *p = new int[n*m];
+    for (int i=0; i<n*m; i++){
+        p[i] = 0;
+    }
+    float r, SQRTD = sqrt(pow(this->width, 2) + pow(this->height, 2));
+    int l;
+    for (int i=0; i<this->height; i++){
+        for (int j=0; j<this->width; j++){
+            if (this->getGreyData(j, i) > 0){
+                for (int k=0; k<m; k++){
+                    r = i*Cos[k] + j*Sin[k];
+                    r+=SQRTD;
+                    r/=(SQRTD*2);
+                    r*=(m-1);
+                    r+=0.5f;
+                    l= (int) floor(r);
+                    p[k * n + l]++; 
+                }
+            }
+        }
+    }
+    // treshold p
+    for (int i=0; i<m; i++){
+        for (int j=0; j<n; j++){
+            p[i*n + j] = p[i*n + j] > t ? 1 : 0;
+            if (p[i*n + j] == 1){
+                cout << i << "," << j << endl;
+            }
+        } 
+    }
+    //create inverse hough
+    unsigned char *temp = new unsigned char[this->size];
+    float y;
+    int j;
+    for (int k=0; k<m; k++){
+        for (int l=0; l<n; l++){
+            y=0.0f;
+            if (p[k*n + l] == 1){
+                for (int i=0; i<this->height; i++){
+                    r = (float) l * 2.0f * SQRTD/(m-1) - SQRTD;
+                    if (Sin[k] == 0.0f){
+                        y++;
+                    } else {
+                        y = (r - (float)i * Cos[k])/Sin[k];
+                    }
+                    y+=0.5f;
+                    j = floor(y);
+                    if (j>=0 && j < this->width && this->getGreyData(j,i)!=0){
+                        temp[i*this->width + j]=255;
+                    }
+                }
+            }
+        }
+    }
+    // copy temp data
+    for (int i=0; i<this->size; i++){
+        this->greyData[i] = temp[i];
+    }
+}

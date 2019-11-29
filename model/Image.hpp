@@ -165,6 +165,8 @@ public:
     void canny(int t);
     // transformasi fourier
     void transformFourier();
+    // transformasi hough
+    void transformHough(int n, int m, int t);
     void show();
 };
 #endif
